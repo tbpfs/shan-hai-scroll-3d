@@ -5,12 +5,12 @@
 > **100% autonomously architected, coded, and visually iterated by Gemini 4 Neon.**
 > Pure native **WebGL2 + GLSL ES 3.00 + Web Audio API** — **zero external dependencies** (no Three.js, no Babylon.js, no textures, no 3D model files).
 
-### Live Interactive Scroll
-- **Enter the Living Painting**: https://tbpfs.github.io/shan-hai-scroll-3d/
-- **Split-Curtain 3D X-Ray (`Song Painting ↔ 64,988-Tri Wireframe`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&curtain=0.5
-- **Lantern Night Mode (`上元夜燈`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&style=night
-- **Sumi-e Wet Ink Mode (`煙雨焦墨`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&style=mono
-- **First-Person River Cruise under Rainbow Bridge (`畫舫穿橋`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=cruise
+### Live Interactive Scroll (v3 Fine-Art Splash-Ink Edition)
+- **Enter the Living Painting (`潑彩青綠`)**: https://tbpfs.github.io/shan-hai-scroll-3d/
+- **Split-Curtain 3D X-Ray (`Fine-Art Painting ↔ 65,746-Tri Wireframe`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&curtain=0.5
+- **Ink & Cinnabar Mode (`墨韻丹砂` — Sumi-e × Vermilion)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&style=mono
+- **Moonlit Gold Mode (`幽冥青燈` — Full Moon & Rippling Reflections)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&style=night
+- **First-Person River Cruise (`畫舫穿橋` — glide past the lone boatman under the arch)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=cruise
 - **Cloud-Sea Flight beside the Spirit Kun (`御鯤凌雲`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=soar
 
 ---
@@ -33,23 +33,20 @@
 
 ---
 
-## Technical Architecture (5-Pass Native WebGL2 Pipeline)
+## Fine-Art Rendering Architecture (Hiding WebGL Limits Through Pure Art Direction)
 
-All ~65,000 triangles, textures, brushstrokes, water reflections, shadows, and Guqin acoustics are procedurally synthesized in pure JavaScript and GLSL ES 3.00:
+All ~65,700 triangles, splash-ink mineral washes, paper fibers, water reflections, and Guqin acoustics are synthesized in pure JavaScript and GLSL ES 3.00:
 
-1. **Pass 1 — Sun Directional Soft Shadow Map (`1024×1024` `DEPTH_COMPONENT24`)**
-   - 5-tap PCF soft shadows across the karst peaks, wooden Rainbow Bridge, curved Song pavilions, and stone piers.
-2. **Pass 2 — True Planar Mirror Water Reflection (`0.5×` FBO)**
-   - Renders the scene mirrored across `y = 0` with fragment plane clipping; the Bianhe River samples the reflection FBO warped by dual-octave scrolling ink-water ripples + Schlick Fresnel + sun/moon specular shimmer.
-3. **Pass 3 — Full-Res MRT Main Scene (`tColor`, `tData`, `tWire`)**
-   - **Karst Gorge & *千里江山圖* Mineral Shading**: `152×152` ridged-multifractal terrain with anisotropic *Fu-Pi Cun* (斧劈皴) rock brushwork, mineral azurite/malachite/ochre strata, gold-leaf sunlit crests, and height-stratified valley mist.
-   - **Hero Song Architecture**: Parabolic interlocking timber Rainbow Bridge (`汴水虹橋`) with continuous sloped vermilion railings, hanging lanterns, oiled-paper parasols, sweeping concave upturned-eave pavilions (`飛檐翹角`), octagonal waterside pavilion, cliff tower, and cloud pagoda.
-   - **GPU Calligraphic Brushstroke Foliage**: Procedurally painted pine needle fans, fountain-arched weeping willow cascades, autumn cinnabar maples, and wind-bent waterside reeds (`FS_FOLIAGE`) — zero primitive sphere trees.
-   - **Ethereal Spirit Kun & Sea of Clouds**: 44-ring smooth-normal celestial whale-leviathan with gossamer silk-filigree wings, drifting valley cloud ribbons, multi-strand cliff waterfalls, and 1,050 glowing spirit embers & fireflies.
-4. **Pass 4 — Quarter-Res Volumetric Sun God-Rays + Separable Gaussian Bloom**
-   - 18-step screen-space radial crepuscular shafts piercing through mountain gaps & under the Rainbow Bridge, blended with 9-tap separable bloom on lanterns, lit windows, and Kun runes.
-5. **Pass 5 — Adaptive Painterly Kuwahara Filter + Song Paper + Live 3D Split Curtain**
-   - 4-sector Kuwahara brushwork smoothing modulated by material type, delicate dry-brush calligraphic edge accents (fading cleanly in mist), antique Xuan-paper fiber warmth, ACES filmic grading, and a live barycentric 3D wireframe curtain.
+1. **Zero Muddy Ground Terrain — Mountain-Base Mist Dissolution (`山腳留白・雲斷山腰`)**
+   - Seven receding layers of multi-shouldered karst peaks rise directly out of an infinite mirror ink sea; distant mountain bases dissolve seamlessly into luminous gold-flecked Xuan paper so there are zero "video-game ground seams."
+2. **Domain-Warped Splash-Ink Shading (`張大千潑彩 × 千里江山金碧`)**
+   - Replaces plastic 3D Lambert shading with 2-stage domain-warped watercolor pigment blooms, soft 5-tone ink quantization (`墨分五色`), vertical *Fu-Pi Cun* rock brushwork, and sunlit gold-leaf ridge highlights (`泥金勾勒`).
+3. **True Planar Mirror Water + Lone Boatman Concentric Ink Ripples (`孤舟漣漪`)**
+   - Half-res mirrored camera FBO reflects the moon-arch bridge, cliff pavilion, lantern tassels, crimson maples, and Spirit Kun with expanding concentric ink rings around the lone bamboo-hatted boatman.
+4. **Capillary Xuan-Paper Ink-Bleed UV Warp + Watercolor Wet-Edge Pooling (`水痕邊`)**
+   - Gently displaces screen UV along organic rice-paper fiber gradients before sampling so straight polygon edges tremble like wet ink soaking into handmade paper, paired with natural pigment-pooling rims, 4-sector Kuwahara brushwork, and scattered gold-leaf paper flecks (`灑金宣紙`).
+5. **Volumetric Sun/Moon God-Rays + Separable Bloom + 3D Swirling Crimson Petals (`落紅如雨`)**
+   - 16-step radial crepuscular shafts, soft separable bloom, and 1,150 tumbling 3D maple petals, gold-leaf sparks, and sumi smoke particles.
 
 ---
 

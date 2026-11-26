@@ -817,33 +817,86 @@ const ShanHaiGeometry = (() => {
     return pb.finish();
   }
 
-  // CREATURE 4: 《山海經・青丘九尾狐》Graceful Volumetric White-Silk Nine-Tailed Spirit Fox!
+  // CREATURE 4: 《山海經・青丘九尾狐》Regal Sculpted White-Silk Nine-Tailed Spirit Fox (Z-buffered 360° sculpture!)
   function buildNineTailFox() {
-    const fb = createSolidBuilder(8192);
-    const white = [0.96, 0.93, 0.86], tipRed = [0.84, 0.16, 0.13];
-    // Poised seated mythic fox torso, arched slender neck, sculpted snout & cinnabar-tipped ears
-    fb.addTaperedTube([[0, 0.35, -0.75], [0, 1.45, -0.1], [0, 2.65, 0.35], [0, 3.35, 0.85], [0, 3.12, 1.65]], [0.88, 0.76, 0.46, 0.44, 0.11], 8, white, 12.0, [0, 0, 0, 0, 0]);
-    for (const s of [-1, 1]) {
-      fb.addTaperedTube([[s * 0.24, 3.52, 0.72], [s * 0.44, 4.35, 0.56]], [0.16, 0.02], 5, tipRed, 12.0, [0, 0]);
-      fb.addTaperedTube([[s * 0.34, 1.95, 0.48], [s * 0.32, 0.0, 0.76]], [0.18, 0.10], 5, white, 12.0, [0, 0]);
+    const fb = createSolidBuilder(14336);
+    const white   = [0.97, 0.94, 0.88];
+    const chestIv = [1.00, 0.98, 0.94];
+    const tipRed  = [0.88, 0.14, 0.11];
+    const inkDark = [0.08, 0.10, 0.13];
+    const eyeGold = [1.00, 0.78, 0.18];
+
+    // 1. Regal seated haunches, arched spine & slender neck (facing +Z!)
+    fb.addTaperedTube(
+      [[0, 0.25, -0.95], [0, 0.92, -0.50], [0, 1.88, 0.08], [0, 2.78, 0.48], [0, 3.38, 0.74]],
+      [0.72, 0.86, 0.66, 0.42, 0.34], 10, white, 12.0, [0, 0, 0, 0, 0]
+    );
+    // Fluffy sculpted chest ruff (白狐胸領蓬毛) + crimson-gold spirit collar & bell (朱砂絲帶金鈴)
+    fb.addTaperedTube(
+      [[0, 1.32, 0.56], [0, 2.02, 0.80], [0, 2.68, 0.82], [0, 3.06, 0.78]],
+      [0.34, 0.62, 0.52, 0.26], 9, chestIv, 12.0, [0, 0, 0, 0]
+    );
+    // Vermilion silk spirit collar wrapping neck + glowing golden jade bell on chest
+    const collarPts = [];
+    for (let i = 0; i <= 10; i++) {
+      const a = (i / 10) * Math.PI * 2;
+      collarPts.push([Math.sin(a) * 0.44, 2.84 - Math.cos(a) * 0.08, 0.54 + Math.cos(a) * 0.42]);
     }
-    // 9 Volumetric Flowing Curved Silk Tails (continuous tapered tubes arcing gracefully like mist plumes!)
+    fb.addTaperedTube(collarPts, collarPts.map(() => 0.075), 6, tipRed, 12.0, collarPts.map(() => 0));
+    fb.addTaperedTube([[0, 2.68, 0.98], [0, 2.52, 1.04]], [0.14, 0.11], 7, eyeGold, 12.0, [0, 0]);
+
+    // Sculpted fox cranium, cheeks & slender pointed muzzle (+Z forward!)
+    fb.addTaperedTube(
+      [[0, 3.44, 0.52], [0, 3.48, 0.96], [0, 3.34, 1.44], [0, 3.16, 1.98], [0, 3.10, 2.28]],
+      [0.36, 0.48, 0.32, 0.14, 0.055], 10, white, 12.0, [0, 0, 0, 0, 0]
+    );
+    // Cheek ruffs (elegant triangular fox face silhouette)
+    for (const s of [-1, 1]) {
+      fb.addTaperedTube([[s * 0.24, 3.34, 0.88], [s * 0.58, 3.24, 0.72]], [0.22, 0.04], 6, chestIv, 12.0, [0, 0]);
+    }
+    // Sumi-ink nose tip (黑墨鼻尖)
+    fb.addTaperedTube([[0, 3.12, 2.24], [0, 3.09, 2.40]], [0.078, 0.032], 6, inkDark, 12.0, [0, 0]);
+    // Cinnabar forehead flame mark (眉間朱砂花鈿 — proud of forehead surface so clearly visible!)
+    fb.addTaperedTube([[0, 3.64, 1.56], [0, 3.84, 1.38], [0, 3.98, 1.24]], [0.045, 0.065, 0.015], 6, tipRed, 12.0, [0, 0, 0]);
+
+    // Tall expressive fox ears + proud slanted phoenix-fox eyes (丹鳳金眸 + 朱砂眼角 + 墨色眼線) + slender legs & sumi-ink paws!
+    for (const s of [-1, 1]) {
+      // Outer white ear, vivid cinnabar inner ear & dark ink ear-tips
+      fb.addTaperedTube([[s * 0.26, 3.74, 0.82], [s * 0.46, 4.48, 0.74], [s * 0.56, 4.96, 0.66]], [0.21, 0.11, 0.02], 6, white, 12.0, [0, 0, 0]);
+      fb.addTaperedTube([[s * 0.27, 3.78, 0.94], [s * 0.45, 4.44, 0.84], [s * 0.52, 4.78, 0.74]], [0.13, 0.068, 0.016], 5, tipRed, 12.0, [0, 0, 0]);
+      fb.addTaperedTube([[s * 0.50, 4.70, 0.70], [s * 0.58, 5.02, 0.64]], [0.068, 0.014], 5, inkDark, 12.0, [0, 0]);
+      // Proud slanted golden phoenix-fox eyes + winged sumi-ink upper eyeliner + cinnabar outer eye flick (朱砂眼尾)!
+      fb.addTaperedTube([[s * 0.16, 3.45, 1.66], [s * 0.34, 3.54, 1.46]], [0.068, 0.056], 6, eyeGold, 12.0, [0, 0]);
+      fb.addTaperedTube([[s * 0.13, 3.51, 1.68], [s * 0.36, 3.61, 1.46], [s * 0.48, 3.68, 1.28]], [0.032, 0.036, 0.016], 5, inkDark, 12.0, [0, 0, 0]);
+      fb.addTaperedTube([[s * 0.35, 3.54, 1.44], [s * 0.50, 3.62, 1.22]], [0.034, 0.014], 5, tipRed, 12.0, [0, 0]);
+      // Slender front legs + seated hind haunch + sumi-ink paws planted solidly on hill
+      fb.addTaperedTube([[s * 0.34, 1.92, 0.52], [s * 0.30, 0.92, 0.72], [s * 0.28, 0.22, 0.82]], [0.20, 0.13, 0.10], 6, white, 12.0, [0, 0, 0]);
+      fb.addTaperedTube([[s * 0.28, 0.24, 0.82], [s * 0.28, -0.04, 1.06]], [0.11, 0.09], 6, inkDark, 12.0, [0, 0]);
+      fb.addTaperedTube([[s * 0.58, 1.02, -0.35], [s * 0.66, 0.26, -0.05], [s * 0.62, -0.02, 0.32]], [0.34, 0.22, 0.12], 6, white, 12.0, [0, 0, 0]);
+    }
+
+    // 2. 9 Lush S-Curved Brush-Stroke Silk Tails (wide peacock halo with curling cinnabar flame-tips visible from front!)
     for (let t = 0; t < 9; t++) {
       const fan = (t / 8) * 2.0 - 1.0; // [-1..1]
-      const angX = fan * 1.15;
-      const archH = 4.2 + (1.0 - Math.abs(fan)) * 2.4;
-      const segs = 12, rSegs = 6;
+      const angX = fan * 1.46;
+      const archH = 2.8 + (1.0 - Math.abs(fan) * 0.78) * 3.0;
+      const segs = 14, rSegs = 6;
       const tRings = [], tNorms = [], tU = [];
       for (let i = 0; i <= segs; i++) {
         const u = i / segs;
-        const cx = Math.sin(angX) * (0.35 + Math.pow(u, 0.92) * 5.2) + Math.sin(u * Math.PI * 1.4 + t) * 0.35;
-        const cy = 0.75 + Math.sin(u * Math.PI * 0.86) * archH + u * 1.1;
-        const cz = -0.65 - u * 4.4 - Math.pow(u, 1.8) * 1.2;
-        const rad = Math.sin(Math.min(1, u * 0.92 + 0.08) * Math.PI) * 0.42 + 0.04;
+        // Wide graceful fan behind shoulders with lush brush S-curve & upturned flame-tip!
+        const spread = Math.sin(angX) * (0.45 + Math.pow(u, 0.82) * 6.8);
+        const sCurve = Math.sin(u * Math.PI * 1.65 + (t % 2 === 0 ? 0.4 : -0.4)) * 0.48 * u;
+        const cx = spread + sCurve;
+        // Tips lift gently upward like calligraphic ink flames so ALL 9 cinnabar tips shine from the front!
+        const cy = 0.65 + Math.sin(u * Math.PI * 0.74) * archH + Math.pow(u, 1.5) * 1.85;
+        const cz = -1.05 - Math.sin(u * Math.PI * 0.72) * 2.4 - u * 0.65 + Math.pow(u, 2.4) * 1.15;
+        // Plump fluffy fox-tail silhouette tapering sharply to an ink-brush point
+        const rad = (Math.sin(Math.min(1, u * 0.94 + 0.06) * Math.PI) * 0.48 + 0.035) * (1.0 - u * 0.25) * (1.0 - Math.abs(fan) * 0.10);
         const pts = [], nms = [];
         for (let j = 0; j < rSegs; j++) {
           const a = (j / rSegs) * Math.PI * 2;
-          const nx = Math.cos(a), ny = Math.sin(a) * 0.8, nz = Math.sin(a) * 0.6;
+          const nx = Math.cos(a), ny = Math.sin(a) * 0.82, nz = Math.sin(a) * 0.58;
           pts.push([cx + nx * rad, cy + ny * rad, cz + nz * rad]);
           nms.push([nx, ny, nz]);
         }
@@ -851,7 +904,7 @@ const ShanHaiGeometry = (() => {
       }
       for (let i = 0; i < segs; i++) {
         const u0 = tU[i], u1 = tU[i + 1];
-        const col0 = u0 > 0.60 ? tipRed : white, col1 = u1 > 0.60 ? tipRed : white;
+        const col0 = u0 > 0.56 ? tipRed : white, col1 = u1 > 0.56 ? tipRed : white;
         for (let j = 0; j < rSegs; j++) {
           const j1 = (j + 1) % rSegs;
           const p00 = tRings[i][j], p10 = tRings[i][j1], p11 = tRings[i + 1][j1], p01 = tRings[i + 1][j];

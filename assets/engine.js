@@ -577,14 +577,28 @@ const ShanHaiEngine = (() => {
         }
         em = clamp((0.28 + veins * 0.45) * mix(0.32, 1.0, uNight), 0.0, 1.0);
       } else {
-        // QINGQIU NINE-TAILED FOX: Luminous Xuan-white silk fur + rich cinnabar-tipped volumetric tails!
-        vec3 bodyShade = mix(vec3(0.76, 0.78, 0.82), vec3(0.98, 0.95, 0.88), max(dot(N, L), 0.0) * 0.55 + 0.45);
-        vec3 foxC = mix(bodyShade, vec3(0.84, 0.15, 0.13), smoothstep(0.42, 0.76, s) + smoothstep(0.7, 0.9, vCol.r - vCol.g));
-        col = foxC + vec3(1.0, 0.84, 0.50) * fres * 0.52;
-        if (wU > 0.08) {
-          alpha = clamp((1.0 - smoothstep(0.68, 1.0, s)) * (0.72 + 0.28 * flow) * 0.92, 0.12, 0.92);
+        // QINGQIU NINE-TAILED FOX: Crisp Z-buffered Xuan-white fur, sumi-ink nose/paws, glowing amber eyes & cinnabar tail tips!
+        float isDark = 1.0 - smoothstep(0.18, 0.42, max(vCol.r, max(vCol.g, vCol.b)));
+        float isEye  = smoothstep(0.45, 0.72, vCol.r - vCol.b) * smoothstep(0.45, 0.72, vCol.g);
+        float isRed  = smoothstep(0.38, 0.66, vCol.r - vCol.g);
+        float ndl = max(dot(N, L), 0.0) * 0.55 + max(dot(N, normalize(vec3(0.4, 0.6, 0.7))), 0.0) * 0.30;
+        vec3 furLight = mix(vec3(0.62, 0.67, 0.73), vec3(0.99, 0.96, 0.90), clamp(ndl + 0.34, 0.0, 1.0));
+        // Subtle cool-celadon depth shadow behind fox shoulders on tail roots so her white face & chest pop clearly in front!
+        float tailRootShadow = (wU > 0.08) ? mix(0.76, 1.0, smoothstep(0.08, 0.58, s)) : 1.0;
+        vec3 baseFox = furLight * tailRootShadow;
+        // Blend smooth cinnabar brush gradient on tail tips & inner ears/forehead mark/collar
+        float redAmt = clamp(smoothstep(0.56, 0.80, s) * step(0.08, wU) + isRed, 0.0, 1.0);
+        baseFox = mix(baseFox, vec3(0.86, 0.14, 0.12) * (0.78 + 0.32 * ndl), redAmt);
+        // Preserve crisp sumi-ink nose/eyelashes/ear-tips/paws and luminous golden phoenix-fox eyes
+        baseFox = mix(baseFox, vec3(0.08, 0.10, 0.13), isDark);
+        baseFox = mix(baseFox, vec3(1.0, 0.78, 0.22), isEye);
+        col = baseFox + vec3(1.0, 0.86, 0.56) * fres * (1.0 - isDark) * 0.34;
+        if (uMono > 0.01) {
+          float g = dot(col, vec3(0.3, 0.59, 0.11));
+          col = mix(col, mix(vec3(g), vec3(0.88, 0.16, 0.12), redAmt * 0.95), uMono);
         }
-        em = clamp((0.28 + fres * 0.48) * mix(0.35, 0.92, uNight), 0.0, 1.0);
+        alpha = 1.0;
+        em = clamp((isEye * 0.95 + fres * 0.32 * (1.0 - isDark)) * mix(0.45, 0.95, uNight), 0.0, 1.0);
       }
 
       col = applyInkMist(col, vWorldPos, uCamPos, L, uNight, uMono, 0.0);
@@ -1228,10 +1242,10 @@ const ShanHaiEngine = (() => {
 
     // ---- Static Poised Creatures (2 Nine-Tailed Spirit Foxes + 2 Golden-Antlered Spirit Stags) ----
     const foxInstances = [
-      { x: -94.2, z: -76.2, rotY:  0.22, sc: 0.96 }, // Facing gracefully toward viewer with 9 silk tails blooming behind like a halo!
-      { x: -113.0, z: -54.0, rotY: 0.45, sc: 0.92 }  // Companion Nine-Tailed Fox on Southern Maple Crag!
+      { x: -94.2, z: -76.2, rotY: 0.44, sc: 1.12 }, // Poised 3/4 facing the Qingqiu viewer with 9 peacock-fan silk tails blooming behind!
+      { x: -112.0, z: -55.0, rotY: 1.18, sc: 1.04 } // Companion Nine-Tailed Fox on Southern Maple Crag facing courtyard!
     ].map((f) => ({
-      mat: mat4ModelTRS(f.x, ShanHaiGeometry.terrainHeight(f.x, f.z) - 0.10, f.z, 0, f.rotY, 0, f.sc, f.sc, f.sc)
+      mat: mat4ModelTRS(f.x, ShanHaiGeometry.terrainHeight(f.x, f.z) - 0.36, f.z, 0, f.rotY, 0, f.sc, f.sc, f.sc)
     }));
 
     const stagInstances = [
@@ -1433,8 +1447,11 @@ const ShanHaiEngine = (() => {
       gl.bindVertexArray(vaoPhoenix);
       phoenixes.forEach((ph) => { gl.uniformMatrix4fv(uSpr.uModel, false, ph.mat); gl.drawArrays(gl.TRIANGLES, 0, world.phoenix.count); });
 
+      // Render Nine-Tailed Spirit Foxes with full hardware depth-write so head/face/ears ALWAYS occlude the 9 tails cleanly from 360°!
+      gl.disable(gl.BLEND); gl.depthMask(true);
       gl.bindVertexArray(vaoFox);
       foxInstances.forEach((fx) => { gl.uniformMatrix4fv(uSpr.uModel, false, fx.mat); gl.drawArrays(gl.TRIANGLES, 0, world.fox.count); });
+      gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
 
       if (!isRefPass) {
         gl.useProgram(progParticles);
@@ -1503,13 +1520,13 @@ const ShanHaiEngine = (() => {
         camPitch = Math.max(-0.62, Math.min(0.92, Math.atan2(dy, Math.hypot(dx, dz)) + state.lookOffsetPitch));
         state.pos = camPos.slice(); state.yaw = camYaw; state.pitch = camPitch; fovy = 58 * Math.PI / 180;
       } else if (state.mode === "qingqiu") {
-        // Serene unobstructed angle showing Paifang, White Spirit Stag, Cinnabar Maples & full 3/4 Nine-Tailed Spirit Fox!
-        const orb = elapsed * 0.12 + 0.15;
-        camPos = [-82.5 + Math.sin(orb) * 10.0, 13.8 + Math.sin(orb * 1.5) * 1.6, -54.0 + Math.cos(orb) * 8.0];
-        const dx = -94.5 - camPos[0], dy = 10.8 - camPos[1], dz = -79.5 - camPos[2];
+        // Serene 3/4 portrait angle showing Nine-Tailed Spirit Fox face, glowing amber eyes, 9-tail halo, Spirit Stag & Paifang!
+        const orb = elapsed * 0.11 + 0.12;
+        camPos = [-85.5 + Math.sin(orb) * 6.5, 13.0 + Math.sin(orb * 1.4) * 1.2, -61.5 + Math.cos(orb) * 4.5];
+        const dx = -94.2 - camPos[0], dy = 11.4 - camPos[1], dz = -76.2 - camPos[2];
         camYaw = Math.atan2(-dx, -dz) + state.lookOffsetYaw;
         camPitch = Math.max(-0.62, Math.min(0.92, Math.atan2(dy, Math.hypot(dx, dz)) + state.lookOffsetPitch));
-        state.pos = camPos.slice(); state.yaw = camYaw; state.pitch = camPitch; fovy = 50 * Math.PI / 180;
+        state.pos = camPos.slice(); state.yaw = camYaw; state.pitch = camPitch; fovy = 48 * Math.PI / 180;
       } else if (state.mode === "phoenix") {
         // Eastern Danshan Sun Spire & Soaring Crimson-Gold Vermilion Phoenixes!
         const ph = phoenixes[0];

@@ -1120,24 +1120,57 @@ const ShanHaiEngine = (() => {
       return { id: "bianhe", zh: "汴水虹橋・孤舟簑笠", en: "BIANHE ARCH · LONE BOATMAN" };
     }
 
-    let dragging = false, lastX = 0, lastY = 0;
-    canvas.addEventListener("pointerdown", (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.setPointerCapture(e.pointerId); });
+    const activePointers = new Map();
+    let prevPinchDist = null;
+    function getPinchDist() {
+      const pts = Array.from(activePointers.values());
+      return Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    }
+    canvas.addEventListener("pointerdown", (e) => {
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType });
+      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+      prevPinchDist = activePointers.size === 2 ? getPinchDist() : null;
+    });
     canvas.addEventListener("pointermove", (e) => {
-      if (!dragging) return;
-      const dx = e.clientX - lastX, dy = e.clientY - lastY;
-      lastX = e.clientX; lastY = e.clientY;
-      if (Math.hypot(dx, dy) > 1.5) notifyEnter();
-      const s = 0.0042;
-      if (state.mode === "free") {
-        state.targetYaw -= dx * s;
-        state.targetPitch = Math.max(-0.72, Math.min(1.05, state.targetPitch + dy * s));
-      } else {
-        state.lookOffsetYaw -= dx * s;
-        state.lookOffsetPitch = Math.max(-0.62, Math.min(0.85, state.lookOffsetPitch + dy * s));
+      const prev = activePointers.get(e.pointerId);
+      if (!prev) return;
+      const dx = e.clientX - prev.x, dy = e.clientY - prev.y;
+      prev.x = e.clientX; prev.y = e.clientY;
+      if (activePointers.size === 1) {
+        if (Math.hypot(dx, dy) > 1.5) notifyEnter();
+        const s = prev.type === "touch" ? 0.0052 : 0.0042;
+        if (state.mode === "free") {
+          state.targetYaw -= dx * s;
+          state.targetPitch = Math.max(-0.72, Math.min(1.05, state.targetPitch + dy * s));
+        } else {
+          state.lookOffsetYaw -= dx * s;
+          state.lookOffsetPitch = Math.max(-0.62, Math.min(0.85, state.lookOffsetPitch + dy * s));
+        }
+      } else if (activePointers.size === 2) {
+        const dist = getPinchDist();
+        if (prevPinchDist !== null) {
+          const delta = dist - prevPinchDist;
+          if (Math.abs(delta) > 0.5) {
+            notifyEnter();
+            if (state.mode !== "free") {
+              state.mode = "free"; state.targetYaw = state.yaw; state.targetPitch = state.pitch;
+              state.lookOffsetYaw = 0; state.lookOffsetPitch = 0;
+              if (callbacks.onModeChange) callbacks.onModeChange("free");
+            }
+            const step = Math.max(-6.0, Math.min(6.0, delta * 0.11));
+            const fwd = [-Math.sin(state.yaw) * Math.cos(state.pitch), Math.sin(state.pitch), -Math.cos(state.yaw) * Math.cos(state.pitch)];
+            state.vel[0] += fwd[0] * step * 2.8; state.vel[1] += fwd[1] * step * 2.0; state.vel[2] += fwd[2] * step * 2.8;
+          }
+        }
+        prevPinchDist = dist;
       }
     });
-    canvas.addEventListener("pointerup", () => { dragging = false; });
-    canvas.addEventListener("pointercancel", () => { dragging = false; });
+    function releasePointer(e) {
+      activePointers.delete(e.pointerId);
+      prevPinchDist = activePointers.size === 2 ? getPinchDist() : null;
+    }
+    canvas.addEventListener("pointerup", releasePointer);
+    canvas.addEventListener("pointercancel", releasePointer);
 
     canvas.addEventListener("wheel", (e) => {
       e.preventDefault(); notifyEnter();
@@ -1521,7 +1554,13 @@ const ShanHaiEngine = (() => {
 
       const lookDir = [-Math.sin(camYaw) * Math.cos(camPitch), Math.sin(camPitch), -Math.cos(camYaw) * Math.cos(camPitch)];
       const target = [camPos[0] + lookDir[0] * 18, camPos[1] + lookDir[1] * 18, camPos[2] + lookDir[2] * 18];
-      const proj = mat4Perspective(fovy, curW / curH, 0.5, 460.0);
+      const aspect = curW / curH;
+      let effFovy = fovy;
+      if (aspect < 1.25) {
+        const aspectScale = Math.pow(1.25 / Math.max(aspect, 0.44), 0.56);
+        effFovy = Math.min(78 * Math.PI / 180, 2.0 * Math.atan(Math.tan(fovy * 0.5) * aspectScale));
+      }
+      const proj = mat4Perspective(effFovy, aspect, 0.5, 460.0);
       const view = mat4LookAt(camPos, target, [0, 1, 0]);
 
       if (!shadowBaked) {

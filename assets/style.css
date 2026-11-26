@@ -1,13 +1,17 @@
-/* 《山海汴京圖》v2 — Museum-Grade Song Scroll Mounting & Translucent Ink-Jade UI */
+/* 《山海汴京圖》v4 — Museum-Grade Song Scroll Mounting & Full-Responsive Ink-Jade UI */
 :root {
   --ink-deep: #131c22;
-  --ink-glass: rgba(14, 22, 27, 0.72);
+  --ink-glass: rgba(14, 22, 27, 0.76);
   --ink-border: rgba(235, 222, 194, 0.24);
   --xuan: #f3ead4;
-  --xuan-dim: rgba(243, 234, 212, 0.78);
+  --xuan-dim: rgba(243, 234, 212, 0.80);
   --cinnabar: #b93226;
   --cinnabar-bright: #d44234;
   --gold: #d9b168;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
   --serif: "Noto Serif TC", "Songti TC", "PMingLiU", "Source Han Serif TC", "STSong", Georgia, serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
@@ -17,29 +21,35 @@
 html, body {
   width: 100%;
   height: 100%;
+  height: 100dvh;
   overflow: hidden;
   background: #141c20;
   color: var(--xuan);
   font-family: var(--serif);
   user-select: none;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
   touch-action: none;
 }
 
 #glCanvas {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: block;
   cursor: grab;
+  touch-action: none;
 }
 #glCanvas:active { cursor: grabbing; }
 
 /* Subtle Silk Scroll Mounting Border (fades cleanly on entry) */
 .scroll-mount {
   position: fixed;
-  inset: 14px;
+  top: calc(14px + var(--safe-t));
+  right: calc(14px + var(--safe-r));
+  bottom: calc(14px + var(--safe-b));
+  left: calc(14px + var(--safe-l));
   border: 1px solid rgba(244, 232, 200, 0.34);
   box-shadow: inset 0 0 0 1px rgba(24, 34, 38, 0.22);
   pointer-events: none;
@@ -51,135 +61,172 @@ body.is-entered .scroll-mount {
   inset: 0;
 }
 
-/* Whisper-quiet museum opening attribution (bottom-left) */
+/* Whisper-quiet museum opening attribution (top-left, zero collision with enter-stage or colophon!) */
 .opening-credit {
   position: fixed;
-  left: 28px;
-  bottom: 24px;
+  top: calc(24px + var(--safe-t));
+  left: calc(24px + var(--safe-l));
   z-index: 6;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  max-width: calc(100vw - 140px);
   padding: 5px 11px;
   border-radius: 999px;
-  background: rgba(16, 24, 28, 0.36);
+  background: rgba(16, 24, 28, 0.42);
   backdrop-filter: blur(6px);
-  border: 1px solid rgba(243, 234, 212, 0.22);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(243, 234, 212, 0.24);
   font-family: var(--mono);
   font-size: 10.5px;
-  letter-spacing: 0.08em;
-  color: rgba(246, 238, 218, 0.86);
+  letter-spacing: 0.07em;
+  color: rgba(246, 238, 218, 0.90);
+  white-space: nowrap;
   pointer-events: none;
   transition: opacity 0.7s ease;
 }
 .credit-dot {
   width: 6px;
   height: 6px;
+  flex-shrink: 0;
   border-radius: 50%;
   background: var(--cinnabar-bright);
   box-shadow: 0 0 8px rgba(212, 66, 52, 0.8);
 }
 body.is-entered .opening-credit { opacity: 0; }
 
-/* Entered Top-Left Sleek Ink-Jade Plaque (HIDDEN on opening frame so painting stays 100% pure!) */
-.top-plaque {
+/* Unified Entered Top HUD Bar (guaranteed zero plaque/links overlap at every width!) */
+.top-hud {
   position: fixed;
-  top: 18px;
-  left: 18px;
+  top: calc(14px + var(--safe-t));
+  left: calc(14px + var(--safe-l));
+  right: calc(14px + var(--safe-r));
   z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s ease;
+}
+body.is-entered .top-hud {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.top-plaque {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 7px 14px;
+  gap: 9px;
+  min-width: 0;
+  padding: 7px 13px;
   background: var(--ink-glass);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--ink-border);
   border-radius: 8px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
-  transition: opacity 0.55s ease, transform 0.55s ease;
-}
-body.is-entered .top-plaque {
-  opacity: 1;
-  transform: translateY(0);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.28);
   pointer-events: auto;
+  transition: opacity 0.35s ease, transform 0.35s ease;
 }
 .plaque-seal {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
   background: var(--cinnabar-bright);
   border-radius: 2px;
   box-shadow: 0 0 10px rgba(212, 66, 52, 0.65);
 }
 .plaque-brand {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   color: var(--xuan);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .plaque-divider {
   width: 1px;
   height: 12px;
+  flex-shrink: 0;
   background: rgba(243, 234, 212, 0.24);
 }
 .plaque-meta, .plaque-stats {
   font-family: var(--mono);
   font-size: 11px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: var(--xuan-dim);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .plaque-stats { color: var(--gold); }
 
-/* Entered Top-Right External Links */
 .top-links {
-  position: fixed;
-  top: 18px;
-  right: 18px;
-  z-index: 12;
   display: flex;
-  gap: 8px;
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
-  transition: opacity 0.55s ease, transform 0.55s ease;
-}
-body.is-entered .top-links {
-  opacity: 1;
-  transform: translateY(0);
+  align-items: center;
+  flex-shrink: 0;
+  gap: 6px;
   pointer-events: auto;
 }
 .mini-link {
-  padding: 7px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 11px;
   background: var(--ink-glass);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--ink-border);
   border-radius: 8px;
   color: var(--xuan);
   text-decoration: none;
   font-family: var(--serif);
-  font-size: 12.5px;
-  letter-spacing: 0.06em;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.2s, border-color 0.2s, opacity 0.3s;
 }
 .mini-link:hover {
-  background: rgba(185, 50, 38, 0.82);
+  background: rgba(185, 50, 38, 0.85);
   border-color: rgba(243, 234, 212, 0.45);
+}
+
+/* Pure Painting Mode (Hide UI / 藏鏡) */
+body.hud-hidden .top-plaque,
+body.hud-hidden .top-links .mini-link:not(.hud-toggle-btn),
+body.hud-hidden .dock,
+body.hud-hidden .region-toast {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+body.hud-hidden .top-plaque {
+  transform: translateY(-8px);
+}
+body.hud-hidden .hud-toggle-btn {
+  opacity: 0.58;
+}
+body.hud-hidden .hud-toggle-btn:hover {
+  opacity: 1;
 }
 
 /* Classical Vertical Song Colophon & Twin Cinnabar Seals */
 .colophon {
   position: fixed;
-  top: 38px;
-  right: 40px;
+  top: calc(34px + var(--safe-t));
+  right: calc(34px + var(--safe-r));
   z-index: 8;
   display: flex;
   flex-direction: row-reverse;
   align-items: flex-start;
-  gap: 14px;
-  padding: 18px 20px 22px 24px;
+  gap: 13px;
+  padding: 16px 18px 20px 22px;
   pointer-events: none;
   background: radial-gradient(ellipse at 65% 45%, rgba(244, 236, 214, 0.62) 0%, rgba(244, 236, 214, 0.22) 55%, rgba(244, 236, 214, 0) 82%);
   border-radius: 16px;
@@ -191,30 +238,30 @@ body.is-entered .colophon {
 }
 .colophon-title {
   writing-mode: vertical-rl;
-  font-size: clamp(32px, 4.1vw, 48px);
+  font-size: clamp(30px, 4vw, 46px);
   font-weight: 700;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.22em;
   color: #161d22;
   text-shadow: 0 1px 16px rgba(248, 240, 220, 0.88);
   line-height: 1.05;
 }
 .colophon-sub {
   writing-mode: vertical-rl;
-  font-size: 13.5px;
-  letter-spacing: 0.26em;
+  font-size: 13px;
+  letter-spacing: 0.24em;
   color: #25343b;
-  padding-top: 8px;
+  padding-top: 6px;
   text-shadow: 0 1px 10px rgba(248, 240, 220, 0.92);
 }
 .seals {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-top: 10px;
+  padding-top: 8px;
 }
 .seal-stamp {
-  width: 28px;
-  height: 28px;
+  width: 27px;
+  height: 27px;
   display: grid;
   place-items: center;
   text-align: center;
@@ -235,32 +282,37 @@ body.is-entered .colophon {
 .enter-stage {
   position: fixed;
   left: 50%;
-  bottom: 42px;
+  bottom: calc(34px + var(--safe-b));
   transform: translateX(-50%);
   z-index: 10;
+  width: min(92vw, 720px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
+  pointer-events: none;
   transition: opacity 0.65s ease, transform 0.65s ease;
 }
 body.is-entered .enter-stage {
   opacity: 0;
   transform: translate(-50%, 16px);
-  pointer-events: none;
+  visibility: hidden;
 }
 .enter-btn {
-  padding: 13px 38px;
-  background: rgba(185, 50, 38, 0.92);
+  pointer-events: auto;
+  min-height: 46px;
+  padding: 12px 36px;
+  background: rgba(185, 50, 38, 0.93);
   color: #fbf4e4;
   border: 1px solid rgba(250, 226, 178, 0.65);
   border-radius: 999px;
   font-family: var(--serif);
-  font-size: 16.5px;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 0.26em;
-  text-indent: 0.26em;
+  letter-spacing: 0.24em;
+  text-indent: 0.24em;
   cursor: pointer;
+  white-space: nowrap;
   box-shadow: 0 12px 36px rgba(18, 12, 10, 0.42), inset 0 1px 0 rgba(255, 240, 210, 0.35);
   transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
 }
@@ -272,34 +324,43 @@ body.is-entered .enter-stage {
 .enter-hint {
   padding: 5px 14px;
   border-radius: 999px;
-  background: rgba(14, 22, 26, 0.56);
+  background: rgba(14, 22, 26, 0.58);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(243, 234, 212, 0.22);
-  font-size: 12.5px;
-  letter-spacing: 0.08em;
-  color: rgba(248, 240, 220, 0.92);
-  white-space: nowrap;
+  font-size: 12px;
+  line-height: 1.45;
+  letter-spacing: 0.06em;
+  color: rgba(248, 240, 220, 0.94);
+  text-align: center;
+  max-width: 100%;
 }
+.hint-touch { display: none; }
 
 /* Poetic Realm Discovery Whisper Banner */
 .region-toast {
   position: fixed;
-  top: 70px;
+  top: calc(60px + var(--safe-t));
   left: 50%;
   transform: translate(-50%, -8px);
   z-index: 11;
-  padding: 6px 20px;
+  max-width: calc(100vw - 28px);
+  padding: 6px 18px;
   border-radius: 999px;
-  background: rgba(14, 22, 27, 0.68);
+  background: rgba(14, 22, 27, 0.72);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(235, 222, 194, 0.28);
   color: #f6ecd6;
-  font-size: 13.5px;
-  letter-spacing: 0.22em;
-  text-indent: 0.22em;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-indent: 0.18em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.65s ease, transform 0.65s ease;
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
 .region-toast.show {
   opacity: 1;
@@ -309,88 +370,105 @@ body.is-entered .enter-stage {
 /* 3D Split Curtain Labels */
 .curtain-handle {
   position: fixed;
-  top: 50%;
+  top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 9;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
 }
 .curtain-handle.visible { opacity: 1; }
 .curtain-pill {
-  padding: 5px 11px;
+  padding: 4px 10px;
   border-radius: 999px;
   font-size: 11px;
   font-family: var(--mono);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   white-space: nowrap;
 }
 .curtain-pill.left {
-  background: rgba(244, 235, 212, 0.85);
+  background: rgba(244, 235, 212, 0.88);
   color: #1a2429;
   border: 1px solid rgba(26, 36, 41, 0.25);
 }
 .curtain-pill.right {
-  background: rgba(12, 22, 28, 0.86);
+  background: rgba(12, 22, 28, 0.88);
   color: #6ef0e6;
   border: 1px solid rgba(110, 240, 230, 0.42);
 }
 
-/* Bottom Translucent Ink-Jade Control Dock */
+/* Bottom Translucent Ink-Jade Control Dock — Desktop Single Sleek Row (>= 1160px) */
 .dock {
   position: fixed;
   left: 50%;
-  bottom: 20px;
+  bottom: calc(18px + var(--safe-b));
   transform: translate(-50%, 16px);
   z-index: 12;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  max-width: calc(100vw - 24px);
-  padding: 8px 14px;
+  gap: 6px;
+  max-width: calc(100vw - 24px - var(--safe-l) - var(--safe-r));
+  padding: 7px 11px;
   background: var(--ink-glass);
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--ink-border);
   border-radius: 14px;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.42);
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.55s ease, transform 0.55s ease;
+  transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s ease;
 }
 body.is-entered .dock {
   opacity: 1;
+  visibility: visible;
   transform: translate(-50%, 0);
   pointer-events: auto;
+}
+.dock-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
 .dock-group {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
+  min-width: 0;
 }
 .dock-sep {
   width: 1px;
-  height: 18px;
-  background: rgba(243, 234, 212, 0.2);
-  margin: 0 2px;
+  height: 16px;
+  flex-shrink: 0;
+  background: rgba(243, 234, 212, 0.22);
+  margin: 0 1px;
 }
 .dock-btn {
-  padding: 6px 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 5px 9px;
   border-radius: 8px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--xuan-dim);
   font-family: var(--serif);
-  font-size: 12.5px;
-  letter-spacing: 0.05em;
+  font-size: 12px;
+  letter-spacing: 0.04em;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: background 0.18s, color 0.18s, border-color 0.18s;
 }
 .dock-btn:hover {
@@ -398,31 +476,33 @@ body.is-entered .dock {
   color: var(--xuan);
 }
 .dock-btn.active {
-  background: rgba(185, 50, 38, 0.88);
+  background: rgba(185, 50, 38, 0.90);
   border-color: rgba(250, 224, 176, 0.45);
   color: #fff8ea;
 }
 .dock-btn.subtle {
   color: var(--gold);
-  border-color: rgba(217, 177, 104, 0.28);
+  border-color: rgba(217, 177, 104, 0.30);
 }
 
 .curtain-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 4px;
+  gap: 7px;
+  padding: 0 3px;
+  flex-shrink: 0;
 }
 .curtain-label {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--gold);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   white-space: nowrap;
 }
 #curtainSlider {
-  width: 84px;
+  width: 72px;
   accent-color: var(--cinnabar-bright);
   cursor: pointer;
+  touch-action: pan-x;
 }
 
 .noscript-fallback {
@@ -436,12 +516,295 @@ body.is-entered .dock {
   color: var(--xuan);
 }
 
-@media (max-width: 860px) {
+/* ==========================================================================
+   Breakpoint 1: Medium Desktop / Tablets / Landscape (<= 1220px)
+   Clean symmetrical 2-row dock, hide verbose plaque metadata
+   ========================================================================== */
+@media (max-width: 1220px) {
   .top-plaque .plaque-meta,
-  .top-plaque .plaque-divider:nth-of-type(2) { display: none; }
-  .colophon { top: 20px; right: 18px; padding: 12px; }
-  .enter-hint { font-size: 11px; white-space: normal; text-align: center; max-width: 90vw; }
-  .opening-credit { display: none; }
-  .dock { bottom: 12px; padding: 7px 10px; gap: 6px; }
-  .dock-sep { display: none; }
+  .top-plaque .div-meta { display: none; }
+
+  .dock {
+    flex-direction: column;
+    gap: 6px;
+    padding: 7px 11px;
+  }
+  .dock-sep-main { display: none; }
+  .dock-row {
+    max-width: 100%;
+    justify-content: center;
+  }
+  .dock-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+  }
+  .dock-scroll::-webkit-scrollbar { display: none; }
+}
+
+/* ==========================================================================
+   Breakpoint 2: Coarse Touch Devices — Tailored Gesture Hint
+   ========================================================================== */
+@media (hover: none) and (pointer: coarse) {
+  .hint-desktop { display: none; }
+  .hint-touch { display: inline-block; }
+}
+
+/* ==========================================================================
+   Breakpoint 3: Mobile Portrait & Compact Screens (<= 640px)
+   Anchored edge-to-edge dock, zero horizontal overflow, clean top HUD
+   ========================================================================== */
+@media (max-width: 640px) {
+  .scroll-mount {
+    top: calc(10px + var(--safe-t));
+    right: calc(10px + var(--safe-r));
+    bottom: calc(10px + var(--safe-b));
+    left: calc(10px + var(--safe-l));
+  }
+
+  .opening-credit {
+    top: calc(18px + var(--safe-t));
+    left: calc(16px + var(--safe-l));
+    font-size: 9.5px;
+    padding: 4px 9px;
+  }
+  .opening-credit .credit-extra { display: none; }
+
+  .colophon {
+    top: calc(18px + var(--safe-t));
+    right: calc(14px + var(--safe-r));
+    padding: 10px 11px 12px 13px;
+    gap: 8px;
+  }
+  .colophon-title { font-size: 28px; letter-spacing: 0.18em; }
+  .colophon-sub { font-size: 11px; letter-spacing: 0.18em; padding-top: 4px; }
+  .seal-stamp { width: 23px; height: 23px; font-size: 8px; }
+
+  .enter-stage {
+    bottom: calc(22px + var(--safe-b));
+    width: calc(100vw - 28px);
+    gap: 8px;
+  }
+  .enter-btn {
+    padding: 11px 28px;
+    font-size: 15px;
+    letter-spacing: 0.2em;
+    text-indent: 0.2em;
+  }
+  .enter-hint {
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 14px;
+  }
+  .hint-desktop { display: none; }
+  .hint-touch { display: inline-block; }
+
+  .top-hud {
+    top: calc(10px + var(--safe-t));
+    left: calc(10px + var(--safe-l));
+    right: calc(10px + var(--safe-r));
+    gap: 6px;
+  }
+  .top-plaque {
+    padding: 6px 9px;
+    gap: 6px;
+  }
+  .top-plaque .plaque-stats,
+  .top-plaque .div-stats { display: none; }
+  .plaque-brand {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+  .top-links { gap: 4px; }
+  .mini-link {
+    min-height: 32px;
+    padding: 5px 8px;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+
+  .region-toast {
+    top: calc(50px + var(--safe-t));
+    font-size: 11.5px;
+    letter-spacing: 0.10em;
+    text-indent: 0.10em;
+    padding: 5px 13px;
+  }
+
+  .curtain-handle { gap: 10px; }
+  .curtain-pill { font-size: 9.5px; padding: 3px 8px; }
+
+  /* Edge-anchored mobile dock — impossible to overflow horizontally */
+  .dock {
+    left: calc(10px + var(--safe-l));
+    right: calc(10px + var(--safe-r));
+    bottom: calc(10px + var(--safe-b));
+    max-width: none;
+    width: auto;
+    transform: translateY(16px);
+    padding: 7px 8px 8px;
+    gap: 6px;
+    border-radius: 13px;
+  }
+  body.is-entered .dock {
+    transform: translateY(0);
+  }
+  .dock-row {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .dock-row-realms {
+    overflow: hidden;
+  }
+  .dock-scroll {
+    width: 100%;
+    gap: 4px;
+    padding-right: 12px;
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 16px), transparent 100%);
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 16px), transparent 100%);
+  }
+  .dock-row-tools {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(243, 234, 212, 0.13);
+  }
+  .dock-sep-sub { display: none; }
+  .dock-styles {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+  }
+  .dock-styles .dock-btn {
+    padding: 5px 4px;
+    font-size: 11.5px;
+    min-height: 32px;
+  }
+  .dock-utils {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .curtain-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 2px;
+  }
+  #curtainSlider {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 70px;
+  }
+  .dock-btn {
+    min-height: 34px;
+    padding: 5px 9px;
+    font-size: 11.5px;
+  }
+}
+
+/* Ultra-compact phones (<= 355px, e.g. 320px iPhone SE) */
+@media (max-width: 355px) {
+  .mini-link.link-learn { display: none; }
+  .mini-link { padding: 5px 7px; font-size: 10.5px; }
+  .plaque-brand { font-size: 11.5px; }
+}
+
+/* ==========================================================================
+   Breakpoint 4: Mobile Landscape & Short Viewports (max-height <= 500px)
+   Ultra-compact vertical footprint so the painting & creatures breathe!
+   ========================================================================== */
+@media (max-height: 500px) and (min-width: 480px) {
+  .scroll-mount {
+    top: calc(8px + var(--safe-t));
+    right: calc(8px + var(--safe-r));
+    bottom: calc(8px + var(--safe-b));
+    left: calc(8px + var(--safe-l));
+  }
+  .opening-credit {
+    top: calc(14px + var(--safe-t));
+    left: calc(16px + var(--safe-l));
+    font-size: 9.5px;
+    padding: 4px 9px;
+  }
+  .colophon {
+    top: calc(12px + var(--safe-t));
+    right: calc(14px + var(--safe-r));
+    padding: 8px 10px 10px 12px;
+    gap: 8px;
+  }
+  .colophon-title { font-size: 22px; letter-spacing: 0.16em; }
+  .colophon-sub { font-size: 10.5px; letter-spacing: 0.16em; padding-top: 2px; }
+  .seal-stamp { width: 21px; height: 21px; font-size: 7.5px; }
+
+  .enter-stage {
+    bottom: calc(12px + var(--safe-b));
+    gap: 5px;
+  }
+  .enter-btn {
+    min-height: 38px;
+    padding: 8px 26px;
+    font-size: 13.5px;
+    letter-spacing: 0.18em;
+    text-indent: 0.18em;
+  }
+  .enter-hint {
+    font-size: 10.5px;
+    padding: 3px 11px;
+  }
+
+  .top-hud {
+    top: calc(8px + var(--safe-t));
+    left: calc(10px + var(--safe-l));
+    right: calc(10px + var(--safe-r));
+  }
+  .top-plaque { padding: 5px 10px; gap: 7px; }
+  .plaque-brand { font-size: 12px; }
+  .plaque-stats { font-size: 10px; }
+  .mini-link { min-height: 28px; padding: 4px 9px; font-size: 11px; }
+
+  /* Place region toast cleanly in the top center gap so it NEVER blocks the Dragon or Arch! */
+  .region-toast {
+    top: calc(9px + var(--safe-t));
+    max-width: 34vw;
+    font-size: 11px;
+    letter-spacing: 0.10em;
+    text-indent: 0.10em;
+    padding: 4px 12px;
+  }
+
+  .dock {
+    bottom: calc(8px + var(--safe-b));
+    padding: 5px 9px;
+    gap: 4px;
+    border-radius: 11px;
+  }
+  .dock-btn {
+    min-height: 26px;
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  .curtain-label { font-size: 11px; }
+  #curtainSlider { width: 64px; }
+}
+
+/* Accessibility: Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-mount,
+  .opening-credit,
+  .top-hud,
+  .top-plaque,
+  .colophon,
+  .enter-stage,
+  .enter-btn,
+  .region-toast,
+  .curtain-handle,
+  .dock,
+  .dock-btn,
+  .mini-link {
+    transition-duration: 0.01ms !important;
+  }
 }

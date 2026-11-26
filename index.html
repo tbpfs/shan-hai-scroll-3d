@@ -13,32 +13,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>山海汴京圖｜走進清明上河圖 × 山海經 3D 即時水墨世界 (WebGL2)</title>
-<meta name="description" content="第一秒以為是宋代青綠水墨古卷，下一秒第一人稱破畫飛入即時 3D 山河：泛舟穿越汴河虹橋倒影、仰望雲海北冥巨鯤與飛檐樓閣。零外部依賴純 WebGL2 五段水墨管線，由 Gemini 4 Neon 全自動打造。">
+<meta name="description" content="第一秒以為是張大千潑彩與宋元水墨古卷，下一秒第一人稱破畫飛入 380m×400m 四大仙境：汴水虹橋孤舟、蓬萊雙鯤、不周天門 70m 應龍、青丘九尾靈狐與丹山朱鳳。零外部依賴純 WebGL2，由 Gemini 4 Neon 全自動打造。">
 <link rel="canonical" href="https://tbpfs.github.io/shan-hai-scroll-3d/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="山海汴京圖｜清明上河圖 × 山海經 3D 即時水墨世界">
-<meta property="og:description" content="不是平面古畫，是可 360° 第一人稱自由飛行的 3D 水墨世界：即時水面倒影、太陽軟陰影、水墨點葉筆刷、體積雲海與耶穌光。由 Gemini 4 Neon 零依賴純 WebGL2 打造。">
+<meta property="og:title" content="山海汴京圖 v4｜清明上河圖 × 山海經 3D 四境七靈即時水墨世界">
+<meta property="og:description" content="不是平面古畫，是可 360° 第一人稱自由飛行的 380m×400m 宋代潑彩水墨 3D 世界：7 種山海經活體神獸、即時水面倒影與 3D 線框透視幕簾。由 Gemini 4 Neon 零依賴純 WebGL2 打造。">
 <meta property="og:url" content="https://tbpfs.github.io/shan-hai-scroll-3d/">
 <meta property="og:image" content="https://tbpfs.github.io/shan-hai-scroll-3d/assets/og-cover.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="山海汴京圖 v2 WebGL2 即時 3D 宋代青綠水墨世界，展示汴河虹橋水面倒影、千里青綠山嵐與山海經流光巨鯤">
+<meta property="og:image:alt" content="山海汴京圖 v4 WebGL2 即時 3D 潑彩水墨開放世界：左側灑金宣紙古畫與孤舟倒影、右側 104,700 三角形 3D 拓撲線框對照實機畫面">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@tbpfs1">
 <meta name="twitter:creator" content="@tbpfs1">
-<meta name="twitter:title" content="Shan Hai Bianjing 3D — Step Inside a Living Song-Dynasty Ink Scroll">
-<meta name="twitter:description" content="First-person 3D Song-dynasty ink world built in pure zero-dependency WebGL2 by Gemini 4 Neon: live planar water reflections, PCF shadows, calligraphic brush foliage, volumetric mist & Spirit Kun.">
+<meta name="twitter:title" content="Shan Hai Bianjing 3D v4 — 4 Mythic Ink Realms & 7 Living Beasts in Pure WebGL2">
+<meta name="twitter:description" content="First-person 380m×400m 3D Song-dynasty splash-ink world built in pure zero-dependency WebGL2 by Gemini 4 Neon: Winged Yinglong Dragon, Twin Kuns, Nine-Tailed Foxes, Phoenixes & live 3D X-Ray curtain.">
 <meta name="twitter:image" content="https://tbpfs.github.io/shan-hai-scroll-3d/assets/og-cover.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20261126-v4">
+<link rel="stylesheet" href="assets/style.css?v=20261126-v4-rwd">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
   "name": "Shan Hai Bianjing 3D (山海汴京圖)",
-  "description": "Zero-dependency pure WebGL2 5-pass Song-Dynasty painterly ink-wash 3D world with first-person exploration, planar water reflections, PCF shadows, GPU calligraphic foliage, volumetric sun god-rays, and Kuwahara brushwork filter — autonomously built by Gemini 4 Neon.",
+  "description": "Zero-dependency pure WebGL2 5-pass Song-Dynasty splash-ink 3D open world spanning 380m×400m across 4 mythic realms with 7 animated Shan Hai Jing creatures, planar water reflections, PCF shadows, capillary Xuan-paper ink bleed, and live 3D wireframe curtain — autonomously built by Gemini 4 Neon.",
   "url": "https://tbpfs.github.io/shan-hai-scroll-3d/",
   "codeRepository": "https://github.com/tbpfs/shan-hai-scroll-3d",
   "programmingLanguage": ["JavaScript", "GLSL", "HTML", "CSS"],
@@ -58,33 +58,35 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- 細緻宋絹裝裱內框 -->
 <div class="scroll-mount" aria-hidden="true"></div>
 
-<!-- 入畫前低調角落印記（不干擾古畫構圖） -->
+<!-- 入畫前低調左上角印記（不與題跋或下方按鈕重疊） -->
 <div class="opening-credit">
   <span class="credit-dot" aria-hidden="true"></span>
-  <span>100% BUILT BY GEMINI 4 NEON · PURE WEBGL2 · 0 DEPS</span>
+  <span>GEMINI 4 NEON<span class="credit-extra"> · PURE WEBGL2 · 0 DEPS</span></span>
 </div>
 
-<!-- 入畫後左上極簡墨玉狀態牌 -->
-<header class="top-plaque">
-  <span class="plaque-seal" aria-hidden="true"></span>
-  <span class="plaque-brand" data-zh="山海汴京圖" data-en="SHAN HAI BIANJING 3D">山海汴京圖</span>
-  <span class="plaque-divider" aria-hidden="true"></span>
-  <span class="plaque-meta">GEMINI 4 NEON · PURE WEBGL2 · 0 DEPS</span>
-  <span class="plaque-divider" aria-hidden="true"></span>
-  <span class="plaque-stats" id="statsReadout">-- TRIS</span>
-</header>
+<!-- 入畫後頂部統一墨玉橫幅（Flex 兩端對齊，絕不重疊） -->
+<div class="top-hud">
+  <header class="top-plaque">
+    <span class="plaque-seal" aria-hidden="true"></span>
+    <span class="plaque-brand" data-zh="山海汴京圖" data-en="SHAN HAI 3D">山海汴京圖</span>
+    <span class="plaque-divider div-meta" aria-hidden="true"></span>
+    <span class="plaque-meta">GEMINI 4 NEON · PURE WEBGL2 · 0 DEPS</span>
+    <span class="plaque-divider div-stats" aria-hidden="true"></span>
+    <span class="plaque-stats" id="statsReadout">-- TRIS</span>
+  </header>
 
-<!-- 右上入畫後連結 -->
-<nav class="top-links" aria-label="專案與作者連結">
-  <button type="button" class="mini-link" id="btnLang">EN</button>
-  <a class="mini-link" href="https://ai-purplemaple.com/learn/" target="_blank" rel="noopener" data-zh="紫楓出版社" data-en="Purple Maple /learn">紫楓出版社</a>
-  <a class="mini-link" href="https://github.com/tbpfs/shan-hai-scroll-3d" target="_blank" rel="noopener">GitHub</a>
-</nav>
+  <nav class="top-links" aria-label="專案與作者連結">
+    <button type="button" class="mini-link hud-toggle-btn" id="btnHudToggle" title="隱藏／顯示操作介面 (H)" aria-pressed="false" data-zh="藏鏡" data-en="Hide UI">藏鏡</button>
+    <button type="button" class="mini-link link-lang" id="btnLang">EN</button>
+    <a class="mini-link link-learn" href="https://ai-purplemaple.com/learn/" target="_blank" rel="noopener" data-zh="紫楓出版社" data-en="Learn">紫楓出版社</a>
+    <a class="mini-link link-gh" href="https://github.com/tbpfs/shan-hai-scroll-3d" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</div>
 
 <!-- 右上古典豎排題跋與朱砂閒章（入畫後如煙淡出） -->
 <aside class="colophon" aria-hidden="true">
   <h1 class="colophon-title">山海汴京圖</h1>
-  <p class="colophon-sub">清明虹橋・千里青綠・北冥巨鯤</p>
+  <p class="colophon-sub">清明虹橋・千里青綠・山海七靈</p>
   <div class="seals">
     <span class="seal-stamp solid">紫楓<br>監製</span>
     <span class="seal-stamp">霓虹<br>入畫</span>
@@ -94,7 +96,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- 開場「踏入畫卷」浮動印鈕 -->
 <div class="enter-stage">
   <button type="button" class="enter-btn" id="btnEnter" data-zh="踏入畫卷" data-en="ENTER THE 3D SCROLL">踏入畫卷</button>
-  <span class="enter-hint" data-zh="千里山海四境 · 拖曳 360° 環顧 · WASD 飛行（Shift 御風加速）探索七大山海靈獸" data-en="4 Mythic Realms · Drag to look 360° · WASD to fly (Shift boost) &amp; discover 7 Shan Hai Jing creatures">千里山海四境 · 拖曳 360° 環顧 · WASD 飛行（Shift 御風加速）探索七大山海靈獸</span>
+  <span class="enter-hint hint-desktop" data-zh="千里山海四境 · 拖曳 360° 環顧 · WASD 飛行（Shift 御風加速）探索七大山海靈獸" data-en="4 Mythic Realms · Drag to look 360° · WASD to fly (Shift boost) &amp; explore 7 Shan Hai Jing beasts">千里山海四境 · 拖曳 360° 環顧 · WASD 飛行（Shift 御風加速）探索七大山海靈獸</span>
+  <span class="enter-hint hint-touch" data-zh="單指拖曳 360° 環顧 · 雙指開合飛行 · 探索四境七靈" data-en="Drag to look 360° · Pinch to fly · Explore 4 realms &amp; 7 beasts">單指拖曳 360° 環顧 · 雙指開合飛行 · 探索四境七靈</span>
 </div>
 
 <!-- 飛入新境時如煙浮現的境名題字 -->
@@ -106,30 +109,36 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <span class="curtain-pill right" data-zh="3D 拓撲線框" data-en="3D WIREFRAME">3D 拓撲線框</span>
 </div>
 
-<!-- 底部極簡墨玉控制列（入畫後浮現） -->
+<!-- 底部極簡墨玉控制列（入畫後浮現，全裝置自適應單排／雙排／滑動軌） -->
 <div class="dock" role="toolbar" aria-label="視角與水墨控制列">
-  <div class="dock-group" role="group" aria-label="山海四境導覽">
-    <button type="button" class="dock-btn active" data-mode="free" data-zh="自由漫遊" data-en="Free Fly">自由漫遊</button>
-    <button type="button" class="dock-btn" data-mode="cruise" data-zh="畫舫穿橋" data-en="Bridge">畫舫穿橋</button>
-    <button type="button" class="dock-btn" data-mode="soar" data-zh="御鯤蓬萊" data-en="Twin Kun">御鯤蓬萊</button>
-    <button type="button" class="dock-btn" data-mode="dragon" data-zh="應龍天門" data-en="Dragon Gate">應龍天門</button>
-    <button type="button" class="dock-btn" data-mode="qingqiu" data-zh="青丘靈狐" data-en="Nine-Tail Fox">青丘靈狐</button>
-    <button type="button" class="dock-btn" data-mode="phoenix" data-zh="丹山朱鳳" data-en="Phoenix">丹山朱鳳</button>
-    <button type="button" class="dock-btn subtle" id="btnReset" title="Reset View (R)" data-zh="復位" data-en="Reset">復位</button>
+  <div class="dock-row dock-row-realms">
+    <div class="dock-group dock-scroll" role="group" aria-label="山海四境導覽">
+      <button type="button" class="dock-btn active" data-mode="free" data-zh="自由漫遊" data-en="Free Fly">自由漫遊</button>
+      <button type="button" class="dock-btn" data-mode="cruise" data-zh="畫舫穿橋" data-en="Bridge">畫舫穿橋</button>
+      <button type="button" class="dock-btn" data-mode="soar" data-zh="御鯤蓬萊" data-en="Twin Kun">御鯤蓬萊</button>
+      <button type="button" class="dock-btn" data-mode="dragon" data-zh="應龍天門" data-en="Dragon Gate">應龍天門</button>
+      <button type="button" class="dock-btn" data-mode="qingqiu" data-zh="青丘靈狐" data-en="Nine-Tail Fox">青丘靈狐</button>
+      <button type="button" class="dock-btn" data-mode="phoenix" data-zh="丹山朱鳳" data-en="Phoenix">丹山朱鳳</button>
+      <button type="button" class="dock-btn subtle" id="btnReset" title="Reset View (R)" data-zh="復位" data-en="Reset">復位</button>
+    </div>
   </div>
-  <span class="dock-sep" aria-hidden="true"></span>
-  <div class="dock-group" role="group" aria-label="水墨意境">
-    <button type="button" class="dock-btn active" data-style="bluegreen" data-zh="潑彩青綠" data-en="Splash Jade">潑彩青綠</button>
-    <button type="button" class="dock-btn" data-style="mono" data-zh="墨韻丹砂" data-en="Ink &amp; Cinnabar">墨韻丹砂</button>
-    <button type="button" class="dock-btn" data-style="night" data-zh="幽冥青燈" data-en="Moonlit Gold">幽冥青燈</button>
+  <span class="dock-sep dock-sep-main" aria-hidden="true"></span>
+  <div class="dock-row dock-row-tools">
+    <div class="dock-group dock-styles" role="group" aria-label="水墨意境">
+      <button type="button" class="dock-btn active" data-style="bluegreen" data-zh="潑彩青綠" data-en="Splash Jade">潑彩青綠</button>
+      <button type="button" class="dock-btn" data-style="mono" data-zh="墨韻丹砂" data-en="Ink &amp; Cinnabar">墨韻丹砂</button>
+      <button type="button" class="dock-btn" data-style="night" data-zh="幽冥青燈" data-en="Moonlit Gold">幽冥青燈</button>
+    </div>
+    <span class="dock-sep dock-sep-sub" aria-hidden="true"></span>
+    <div class="dock-group dock-utils">
+      <div class="curtain-wrap">
+        <span class="curtain-label" data-zh="破畫 3D" data-en="3D X-RAY">破畫 3D</span>
+        <input id="curtainSlider" type="range" min="0" max="100" value="0" aria-label="水墨與 3D 線框分割幕簾">
+      </div>
+      <span class="dock-sep dock-sep-sub" aria-hidden="true"></span>
+      <button type="button" class="dock-btn" id="btnAudio" data-zh="撫琴：關" data-en="Guqin: OFF">撫琴：關</button>
+    </div>
   </div>
-  <span class="dock-sep" aria-hidden="true"></span>
-  <div class="curtain-wrap">
-    <span class="curtain-label" data-zh="破畫 3D" data-en="3D X-RAY">破畫 3D</span>
-    <input id="curtainSlider" type="range" min="0" max="100" value="0" aria-label="水墨與 3D 線框分割幕簾">
-  </div>
-  <span class="dock-sep" aria-hidden="true"></span>
-  <button type="button" class="dock-btn" id="btnAudio" data-zh="撫琴：關" data-en="Guqin: OFF">撫琴：關</button>
 </div>
 
 <noscript>
@@ -139,9 +148,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   </div>
 </noscript>
 
-<script src="assets/geometry.js?v=20261126-v4"></script>
-<script src="assets/audio.js?v=20261126-v4"></script>
-<script src="assets/engine.js?v=20261126-v4"></script>
+<script src="assets/geometry.js?v=20261126-v4-rwd"></script>
+<script src="assets/audio.js?v=20261126-v4-rwd"></script>
+<script src="assets/engine.js?v=20261126-v4-rwd"></script>
 <script>
 (() => {
   "use strict";
@@ -152,6 +161,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   const curtainHandle = document.getElementById("curtainHandle");
   const btnAudio = document.getElementById("btnAudio");
   const btnLang = document.getElementById("btnLang");
+  const btnHudToggle = document.getElementById("btnHudToggle");
   const btnEnter = document.getElementById("btnEnter");
   const btnReset = document.getElementById("btnReset");
   const regionToast = document.getElementById("regionToast");
@@ -166,14 +176,25 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
   let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "zh";
   let audioOn = false;
+  let hudHidden = false;
+
+  function updateHudToggleLabel() {
+    btnHudToggle.textContent = lang === "en"
+      ? (hudHidden ? "Show UI" : "Hide UI")
+      : (hudHidden ? "顯鏡" : "藏鏡");
+    btnHudToggle.setAttribute("aria-pressed", String(hudHidden));
+    body.classList.toggle("hud-hidden", hudHidden);
+  }
 
   function applyLang() {
     document.documentElement.lang = lang === "en" ? "en" : "zh-Hant";
     btnLang.textContent = lang === "en" ? "繁中" : "EN";
     document.querySelectorAll("[data-zh]").forEach((el) => {
+      if (el === btnAudio || el === btnHudToggle) return;
       el.textContent = lang === "en" ? el.dataset.en : el.dataset.zh;
     });
     updateAudioLabel();
+    updateHudToggleLabel();
   }
 
   function updateAudioLabel() {
@@ -184,7 +205,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   }
 
   function syncModeButtons(mode) {
-    document.querySelectorAll("[data-mode]").forEach((b) => b.classList.toggle("active", b.dataset.mode === mode));
+    document.querySelectorAll("[data-mode]").forEach((b) => {
+      const isActive = b.dataset.mode === mode;
+      b.classList.toggle("active", isActive);
+      if (isActive && window.innerWidth <= 640 && b.scrollIntoView) {
+        try { b.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }); } catch (_) {}
+      }
+    });
   }
 
   function syncStyleButtons(style) {
@@ -196,7 +223,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     curtainSlider.value = String(pct);
     const active = curtainFrac > 0.03 && curtainFrac < 0.97;
     curtainHandle.classList.toggle("visible", active);
-    curtainHandle.style.left = (curtainFrac * 100).toFixed(2) + "%";
+    const margin = window.innerWidth <= 640 ? 22 : 12;
+    const clampedPct = Math.max(margin, Math.min(100 - margin, curtainFrac * 100));
+    curtainHandle.style.left = clampedPct.toFixed(2) + "%";
   }
 
   function markEntered() {
@@ -263,7 +292,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     applyLang();
   });
 
-  // Keyboard shortcuts: X toggles 50% 3D X-Ray split curtain; R resets view; 1/2/3 switch moods
+  btnHudToggle.addEventListener("click", () => {
+    hudHidden = !hudHidden;
+    updateHudToggleLabel();
+  });
+
+  window.addEventListener("resize", () => syncCurtainUI(engine.state.targetCurtain));
+
+  // Keyboard shortcuts: X toggles 50% 3D X-Ray split curtain; R resets view; H toggles HUD; 1/2/3 switch moods
   window.addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
     if (k === "x") {
@@ -275,6 +311,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       markEntered();
       engine.resetView();
       syncModeButtons("free");
+    } else if (k === "h") {
+      markEntered();
+      hudHidden = !hudHidden;
+      updateHudToggleLabel();
     } else if (k === "1") {
       engine.setStyle("bluegreen"); syncStyleButtons("bluegreen");
     } else if (k === "2") {

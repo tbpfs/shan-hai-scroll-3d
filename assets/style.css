@@ -1,432 +1,422 @@
-/* ==========================================================================
-   《山海汴京圖》Shan Hai Bianjing 3D — Song-Dynasty Scroll Mounting UI
-   Ultra-minimalist full-bleed 100vw × 100vh canvas · Anti-AI-Slop
-   ========================================================================== */
-
+/* 《山海汴京圖》v2 — Museum-Grade Song Scroll Mounting & Translucent Ink-Jade UI */
 :root {
-  --paper: #f1e9d8;
-  --paper-glass: rgba(242, 234, 217, 0.84);
-  --ink: #1c2023;
-  --ink-soft: #4e565c;
-  --ink-line: rgba(28, 32, 35, 0.22);
-  --cinnabar: #bf3426;
-  --cinnabar-hi: #d84333;
-  --jade: #2e6058;
-  --font-serif: "Noto Serif TC", "Songti TC", "PMingLiU", "Georgia", serif;
-  --font-sans: "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --ink-deep: #131c22;
+  --ink-glass: rgba(14, 22, 27, 0.72);
+  --ink-border: rgba(235, 222, 194, 0.24);
+  --xuan: #f3ead4;
+  --xuan-dim: rgba(243, 234, 212, 0.78);
+  --cinnabar: #b93226;
+  --cinnabar-bright: #d44234;
+  --gold: #d9b168;
+  --serif: "Noto Serif TC", "Songti TC", "PMingLiU", "Source Han Serif TC", "STSong", Georgia, serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-body.mood-night {
-  --paper-glass: rgba(14, 24, 38, 0.78);
-  --ink: #ede7da;
-  --ink-soft: #9fb4c8;
-  --ink-line: rgba(210, 224, 238, 0.22);
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-*, *::before, *::after { box-sizing: border-box; }
 html, body {
-  margin: 0; padding: 0;
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  background: #ece3cf;
-  color: var(--ink);
-  font-family: var(--font-sans);
+  background: #141c20;
+  color: var(--xuan);
+  font-family: var(--serif);
   user-select: none;
   -webkit-user-select: none;
+  touch-action: none;
 }
 
 #glCanvas {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   display: block;
   cursor: grab;
-  touch-action: none;
 }
 #glCanvas:active { cursor: grabbing; }
 
-/* ==================== 古畫裝裱細絹框（未入畫時呈現，入畫後漸隱） ==================== */
+/* Subtle Silk Scroll Mounting Border (fades cleanly on entry) */
 .scroll-mount {
   position: fixed;
-  inset: 16px;
-  border: 1px solid rgba(56, 46, 34, 0.28);
+  inset: 14px;
+  border: 1px solid rgba(244, 232, 200, 0.34);
+  box-shadow: inset 0 0 0 1px rgba(24, 34, 38, 0.22);
   pointer-events: none;
-  z-index: 10;
-  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), inset 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.scroll-mount::before {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border: 1px solid rgba(56, 46, 34, 0.14);
+  z-index: 4;
+  transition: opacity 0.9s ease, inset 0.9s ease;
 }
 body.is-entered .scroll-mount {
   opacity: 0;
   inset: 0;
 }
 
-/* ==================== 右上宋畫豎排題跋與朱砂印章 ==================== */
+/* Whisper-quiet museum opening attribution (bottom-left) */
+.opening-credit {
+  position: fixed;
+  left: 28px;
+  bottom: 24px;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(16, 24, 28, 0.36);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(243, 234, 212, 0.22);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: rgba(246, 238, 218, 0.86);
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+.credit-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cinnabar-bright);
+  box-shadow: 0 0 8px rgba(212, 66, 52, 0.8);
+}
+body.is-entered .opening-credit { opacity: 0; }
+
+/* Entered Top-Left Sleek Ink-Jade Plaque (HIDDEN on opening frame so painting stays 100% pure!) */
+.top-plaque {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  background: var(--ink-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--ink-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+body.is-entered .top-plaque {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.plaque-seal {
+  width: 9px;
+  height: 9px;
+  background: var(--cinnabar-bright);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(212, 66, 52, 0.65);
+}
+.plaque-brand {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--xuan);
+}
+.plaque-divider {
+  width: 1px;
+  height: 12px;
+  background: rgba(243, 234, 212, 0.24);
+}
+.plaque-meta, .plaque-stats {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--xuan-dim);
+}
+.plaque-stats { color: var(--gold); }
+
+/* Entered Top-Right External Links */
+.top-links {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 12;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+body.is-entered .top-links {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.mini-link {
+  padding: 7px 12px;
+  background: var(--ink-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--ink-border);
+  border-radius: 8px;
+  color: var(--xuan);
+  text-decoration: none;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.mini-link:hover {
+  background: rgba(185, 50, 38, 0.82);
+  border-color: rgba(243, 234, 212, 0.45);
+}
+
+/* Classical Vertical Song Colophon & Twin Cinnabar Seals */
 .colophon {
   position: fixed;
-  top: 34px;
-  right: 36px;
-  z-index: 20;
+  top: 38px;
+  right: 40px;
+  z-index: 8;
   display: flex;
   flex-direction: row-reverse;
   align-items: flex-start;
   gap: 14px;
-  padding: 14px 16px;
-  background: radial-gradient(ellipse at center, rgba(241, 233, 216, 0.76) 0%, rgba(241, 233, 216, 0.0) 80%);
+  padding: 18px 20px 22px 24px;
   pointer-events: none;
+  background: radial-gradient(ellipse at 65% 45%, rgba(244, 236, 214, 0.62) 0%, rgba(244, 236, 214, 0.22) 55%, rgba(244, 236, 214, 0) 82%);
+  border-radius: 16px;
   transition: opacity 0.85s ease, transform 0.85s ease;
 }
 body.is-entered .colophon {
   opacity: 0;
-  transform: translateY(-14px);
+  transform: translateX(18px);
 }
-
 .colophon-title {
   writing-mode: vertical-rl;
-  font-family: var(--font-serif);
-  font-size: clamp(28px, 3.6vw, 44px);
+  font-size: clamp(32px, 4.1vw, 48px);
   font-weight: 700;
   letter-spacing: 0.24em;
-  color: #1c2023;
-  text-shadow: 0 1px 16px rgba(241, 233, 216, 0.85);
-  margin: 0;
-  line-height: 1.1;
+  color: #161d22;
+  text-shadow: 0 1px 16px rgba(248, 240, 220, 0.88);
+  line-height: 1.05;
 }
-
 .colophon-sub {
   writing-mode: vertical-rl;
-  font-family: var(--font-serif);
   font-size: 13.5px;
-  letter-spacing: 0.2em;
-  color: #424a4f;
-  margin-top: 8px;
-  text-shadow: 0 1px 12px rgba(241, 233, 216, 0.9);
+  letter-spacing: 0.26em;
+  color: #25343b;
+  padding-top: 8px;
+  text-shadow: 0 1px 10px rgba(248, 240, 220, 0.92);
 }
-
 .seals {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 6px;
+  padding-top: 10px;
 }
-
 .seal-stamp {
   width: 28px;
   height: 28px;
-  border: 1.8px solid var(--cinnabar);
-  border-radius: 2px;
   display: grid;
   place-items: center;
-  font-family: var(--font-serif);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1.05;
   text-align: center;
+  font-size: 9.5px;
+  line-height: 1.05;
+  font-weight: 700;
   color: var(--cinnabar);
-  background: rgba(241, 233, 216, 0.35);
-  letter-spacing: 0;
+  border: 1.5px solid var(--cinnabar);
+  background: rgba(246, 238, 218, 0.72);
+  border-radius: 3px;
 }
-
 .seal-stamp.solid {
   background: var(--cinnabar);
-  color: #f7efe0;
+  color: #f8f0dc;
 }
 
-/* ==================== 左上極簡銘牌（常駐低調） ==================== */
-.top-plaque {
-  position: fixed;
-  top: 22px;
-  left: 24px;
-  z-index: 25;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  padding: 6px 12px;
-  background: var(--paper-glass);
-  border: 1px solid var(--ink-line);
-  border-radius: 3px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: background 0.4s ease, border-color 0.4s ease;
-}
-
-.plaque-seal {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: var(--cinnabar);
-  border-radius: 1px;
-}
-
-.plaque-brand {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.1em;
-}
-
-.plaque-divider {
-  width: 1px;
-  height: 13px;
-  background: var(--ink-line);
-}
-
-.plaque-meta {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  color: var(--ink-soft);
-}
-
-.plaque-stats {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-variant-numeric: tabular-nums;
-  color: var(--cinnabar);
-  font-weight: 600;
-}
-
-.top-links {
-  position: fixed;
-  top: 22px;
-  right: 24px;
-  z-index: 25;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s ease;
-}
-body.is-entered .top-links {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.mini-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 32px;
-  padding: 0 10px;
-  background: var(--paper-glass);
-  border: 1px solid var(--ink-line);
-  border-radius: 3px;
-  color: var(--ink);
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: border-color 0.16s ease, color 0.16s ease;
-}
-.mini-link:hover { border-color: var(--cinnabar); color: var(--cinnabar); }
-
-/* ==================== 開場「踏入畫卷」浮動引導 ==================== */
+/* Opening Enter Button Stage */
 .enter-stage {
   position: fixed;
   left: 50%;
   bottom: 42px;
   transform: translateX(-50%);
-  z-index: 25;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  gap: 11px;
+  transition: opacity 0.65s ease, transform 0.65s ease;
 }
 body.is-entered .enter-stage {
   opacity: 0;
-  transform: translateX(-50%) translateY(16px);
+  transform: translate(-50%, 16px);
   pointer-events: none;
 }
-
 .enter-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 26px;
-  background: var(--cinnabar);
-  color: #f9f2e4;
-  border: 1px solid rgba(249, 242, 228, 0.35);
-  border-radius: 2px;
-  font-family: var(--font-serif);
-  font-size: 16px;
+  padding: 13px 38px;
+  background: rgba(185, 50, 38, 0.92);
+  color: #fbf4e4;
+  border: 1px solid rgba(250, 226, 178, 0.65);
+  border-radius: 999px;
+  font-family: var(--serif);
+  font-size: 16.5px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.26em;
+  text-indent: 0.26em;
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(130, 28, 18, 0.32);
-  transition: background 0.18s ease, transform 0.18s ease;
+  box-shadow: 0 12px 36px rgba(18, 12, 10, 0.42), inset 0 1px 0 rgba(255, 240, 210, 0.35);
+  transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
 }
 .enter-btn:hover {
-  background: var(--cinnabar-hi);
   transform: translateY(-2px);
+  background: #c93b2d;
+  box-shadow: 0 16px 42px rgba(185, 50, 38, 0.48);
 }
-
 .enter-hint {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: #2b3136;
-  padding: 3px 10px;
-  background: rgba(241, 233, 216, 0.72);
-  border-radius: 2px;
-}
-
-/* ==================== 底部極簡宣紙墨韻操作細帶 ==================== */
-.dock {
-  position: fixed;
-  left: 50%;
-  bottom: 18px;
-  transform: translateX(-50%) translateY(24px);
-  z-index: 30;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px 12px;
-  max-width: calc(100vw - 24px);
-  padding: 7px 14px;
-  background: var(--paper-glass);
-  border: 1px solid var(--ink-line);
-  border-radius: 3px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  opacity: 0;
-  pointer-events: none;
-  transition: background 0.4s ease, border-color 0.4s ease, opacity 0.6s ease, transform 0.6s ease;
-}
-body.is-entered .dock {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
-}
-
-.dock-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.dock-sep {
-  width: 1px;
-  height: 18px;
-  background: var(--ink-line);
-}
-
-.dock-btn {
-  height: 30px;
-  padding: 0 10px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 2px;
-  color: var(--ink-soft);
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(14, 22, 26, 0.56);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(243, 234, 212, 0.22);
   font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-}
-.dock-btn:hover {
-  color: var(--ink);
-  border-color: var(--ink-line);
-}
-.dock-btn.active {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
-}
-body.mood-night .dock-btn.active {
-  background: #e2b45d;
-  color: #0b1420;
-  border-color: #e2b45d;
-}
-.dock-btn.accent-on {
-  background: var(--cinnabar);
-  color: #faf3e5;
-  border-color: var(--cinnabar);
-}
-
-.curtain-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0 4px;
-}
-.curtain-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--cinnabar);
+  letter-spacing: 0.08em;
+  color: rgba(248, 240, 220, 0.92);
   white-space: nowrap;
 }
-#curtainSlider {
-  width: 96px;
-  accent-color: var(--cinnabar);
-  cursor: pointer;
-}
 
-/* ==================== 視覺化朱砂幕簾拖曳把手（幕簾拉開時浮現） ==================== */
+/* 3D Split Curtain Labels */
 .curtain-handle {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 24;
+  z-index: 9;
   display: flex;
   align-items: center;
-  gap: 12px;
-  pointer-events: none;
+  gap: 24px;
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.25s ease;
 }
 .curtain-handle.visible { opacity: 1; }
 .curtain-pill {
-  padding: 3px 9px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  border-radius: 2px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(8px);
   white-space: nowrap;
 }
 .curtain-pill.left {
-  background: rgba(241, 233, 216, 0.9);
-  color: #1c2023;
-  border: 1px solid rgba(28, 32, 35, 0.25);
+  background: rgba(244, 235, 212, 0.85);
+  color: #1a2429;
+  border: 1px solid rgba(26, 36, 41, 0.25);
 }
 .curtain-pill.right {
-  background: rgba(10, 22, 36, 0.9);
-  color: #65d2ef;
-  border: 1px solid rgba(101, 210, 239, 0.45);
+  background: rgba(12, 22, 28, 0.86);
+  color: #6ef0e6;
+  border: 1px solid rgba(110, 240, 230, 0.42);
 }
 
-/* ==================== 錯誤降級提示 ==================== */
-.fallback-msg {
+/* Bottom Translucent Ink-Jade Control Dock */
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translate(-50%, 16px);
+  z-index: 12;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: calc(100vw - 24px);
+  padding: 8px 14px;
+  background: var(--ink-glass);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--ink-border);
+  border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+body.is-entered .dock {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+.dock-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dock-sep {
+  width: 1px;
+  height: 18px;
+  background: rgba(243, 234, 212, 0.2);
+  margin: 0 2px;
+}
+.dock-btn {
+  padding: 6px 11px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--xuan-dim);
+  font-family: var(--serif);
+  font-size: 12.5px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+.dock-btn:hover {
+  background: rgba(243, 234, 212, 0.12);
+  color: var(--xuan);
+}
+.dock-btn.active {
+  background: rgba(185, 50, 38, 0.88);
+  border-color: rgba(250, 224, 176, 0.45);
+  color: #fff8ea;
+}
+.dock-btn.subtle {
+  color: var(--gold);
+  border-color: rgba(217, 177, 104, 0.28);
+}
+
+.curtain-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+.curtain-label {
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+#curtainSlider {
+  width: 84px;
+  accent-color: var(--cinnabar-bright);
+  cursor: pointer;
+}
+
+.noscript-fallback {
   position: fixed;
   inset: 0;
   display: grid;
-  place-items: center;
-  padding: 24px;
+  place-content: center;
   text-align: center;
-  background: #ece3cf;
-  color: #1c2023;
-  z-index: 100;
+  padding: 32px;
+  background: #141c20;
+  color: var(--xuan);
 }
 
-@media (max-width: 760px) {
-  .colophon { top: 68px; right: 20px; }
-  .colophon-title { font-size: 26px; }
-  .plaque-meta { display: none; }
-  .dock { padding: 6px 8px; gap: 5px; bottom: 10px; }
+@media (max-width: 860px) {
+  .top-plaque .plaque-meta,
+  .top-plaque .plaque-divider:nth-of-type(2) { display: none; }
+  .colophon { top: 20px; right: 18px; padding: 12px; }
+  .enter-hint { font-size: 11px; white-space: normal; text-align: center; max-width: 90vw; }
+  .opening-credit { display: none; }
+  .dock { bottom: 12px; padding: 7px 10px; gap: 6px; }
   .dock-sep { display: none; }
-  .dock-btn { padding: 0 7px; font-size: 11.5px; }
-  #curtainSlider { width: 72px; }
 }

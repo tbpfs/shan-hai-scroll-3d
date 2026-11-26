@@ -1,76 +1,80 @@
-# 山海汴京圖 · Shan Hai Bianjing 3D
+# 《山海汴京圖》Shan Hai Bianjing 3D
 
-**Step Inside a Living Song-Dynasty Ink Scroll — *Qingming Scroll* × *Shan Hai Jing* in Pure WebGL2**
+**Looks like a museum Song-Dynasty ink scroll — until you drag the mouse and fly 360° in first person under the Rainbow Bridge beneath a celestial *Shan Hai Jing* Giant Kun.**
 
-[![Built by Gemini 4 Neon](https://img.shields.io/badge/Built%20Autonomously%20by-Gemini%204%20Neon-bf3426?style=flat-square)](https://tbpfs.github.io/shan-hai-scroll-3d/?lang=en)
-[![Zero Dependencies](https://img.shields.io/badge/Dependencies-0%20(Pure%20WebGL2)-2e6058?style=flat-square)](#technical-architecture)
-[![Live Demo](https://img.shields.io/badge/Live%203D%20Scroll-GitHub%20Pages-1c2023?style=flat-square)](https://tbpfs.github.io/shan-hai-scroll-3d/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-4e565c?style=flat-square)](LICENSE)
+> **100% autonomously architected, coded, and visually iterated by Gemini 4 Neon.**
+> Pure native **WebGL2 + GLSL ES 3.00 + Web Audio API** — **zero external dependencies** (no Three.js, no Babylon.js, no textures, no 3D model files).
 
-> **At first glance it looks like a quiet Northern-Song blue-green ink painting.**  
-> **Click, drag, or scroll — and the 2D scroll unfolds into a live, navigable 3D world.**  
-> Sail beneath the timber arch **Rainbow Bridge (虹橋)** from *Along the River During the Qingming Festival*, watch the giant mythical **Kun (北冥巨鯤)** from *Shan Hai Jing* soar past **Penglai floating peaks** and cascading ink waterfalls, or drag the **3D Wireframe Curtain** to reveal the real-time geometry underneath.
->
-> **100% autonomously built by Gemini 4 Neon** — zero Three.js, zero external 3D models, zero image textures, zero audio files.
-
-**Launch Live Experience**: [繁體中文版 (Enter the Scroll)](https://tbpfs.github.io/shan-hai-scroll-3d/) · [English Version](https://tbpfs.github.io/shan-hai-scroll-3d/?lang=en) · [3D Wireframe Split View](https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&curtain=0.5) · [Lantern Night Mood](https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&style=night)
+### Live Interactive Scroll
+- **Enter the Living Painting**: https://tbpfs.github.io/shan-hai-scroll-3d/
+- **Split-Curtain 3D X-Ray (`Song Painting ↔ 64,988-Tri Wireframe`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&curtain=0.5
+- **Lantern Night Mode (`上元夜燈`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&style=night
+- **Sumi-e Wet Ink Mode (`煙雨焦墨`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&style=mono
+- **First-Person River Cruise under Rainbow Bridge (`畫舫穿橋`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=cruise
+- **Cloud-Sea Flight beside the Spirit Kun (`御鯤凌雲`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=soar
 
 ---
 
-### The Plot Twist: Song-Dynasty Ink Scroll ↔ Real-Time 3D Mesh Curtain
+![Song Painting vs 3D Wireframe Split View](docs/screenshots/08_split_curtain_xray.png)
 
-![Shan Hai Bianjing 3D Ink NPR vs 3D Wireframe Split Curtain](docs/screenshots/03_wireframe_split.png)
+## Visual Showcase (Real WebGL2 Captures)
 
-### First Frame: Classic Song-Dynasty Blue-Green Scroll (`北宋青綠`)
+| Opening Song Scroll (`北宋青綠`) | Lantern Night (`上元夜燈`) |
+| :---: | :---: |
+| ![Opening Song Scroll](docs/screenshots/01_opening_scroll.png) | ![Lantern Night Mode](docs/screenshots/07_night_lanterns.png) |
 
-![Shan Hai Bianjing 3D Opening Scroll Vista](docs/screenshots/01_scroll_opening.png)
+| Sumi-e Monochrome (`煙雨焦墨`) | River Cruise under Rainbow Bridge (`畫舫穿橋`) |
+| :---: | :---: |
+| ![Sumi-e Ink Mode](docs/screenshots/09_sumie_mono.png) | ![River Cruise](docs/screenshots/05_under_bridge_cruise.png) |
 
-### Lantern Night Mood (`山海夜燈`) & Monochrome Sumi-e (`焦墨寫意`)
-
-![Shan Hai Bianjing 3D Lantern Night](docs/screenshots/05_night_lanterns.png)
-
-![Shan Hai Bianjing 3D Monochrome Sumi-e Ink](docs/screenshots/04_mono_ink.png)
-
----
-
-## Interactive Experiences Inside the Scroll
-
-* **4 Camera Modes**:
-  1. **Scroll Vista (`古卷遠眺`)** — Classic Song telephoto framing (`37° FOV`), click & drag to orbit 360° or scroll to fly in.
-  2. **Sail Bridge (`泛舟過虹橋`)** — Drop down to river level and glide straight beneath the woven timber arch of the Rainbow Bridge.
-  3. **Ride the Kun (`御鯤巡天`)** — Wingman chase camera soaring alongside the swimming *Shan Hai Jing* Giant Kun past Penglai waterfalls.
-  4. **Free Fly (`WASD`)** — Explore any corner of Bianjing town, the river docks, or the floating mountain pagodas.
-* **3 Real-Time Ink Moods**:
-  * **Song Blue-Green (`北宋青綠`)** — Mineral azurite peaks, malachite slopes, warm ochre foothills, and Xuan-paper mist inspired by *A Thousand Li of Rivers and Mountains*.
-  * **Sumi-e Monochrome (`焦墨寫意`)** — Pure ink-wash grayscale preserving only imperial cinnabar sun & silk lanterns.
-  * **Lantern Night (`山海夜燈`)** — Indigo ink nightscape with glowing Song wooden lattice windows, shimmering river reflections, and a luminescent cyan-gold Kun.
-* **Real-Time 3D Wireframe Curtain (`X` key or bottom slider)**: Smoothly slice the painting open with a cinnabar scan beam to expose the anti-aliased 3D triangle mesh (`~49k` procedural triangles) rendered live underneath.
-* **Zero-Asset Procedural Web Audio (`撫琴`)**: Real-time synthesized Song-Dynasty Guqin harmonics (D-Pentatonic `宮商角徵羽`), valley breeze, and deep ethereal Kun calls.
+| Soaring beside the Spirit Kun (`御鯤凌雲`) | 180° Reverse First-Person Vista |
+| :---: | :---: |
+| ![Cloud Kun Soar](docs/screenshots/06_cloud_kun_soar.png) | ![Reverse Vista](docs/screenshots/04_look_back_180.png) |
 
 ---
 
-## Technical Architecture {#technical-architecture}
+## Technical Architecture (5-Pass Native WebGL2 Pipeline)
 
-| Layer | Implementation (100% Native Web · Zero Dependencies) |
-| :--- | :--- |
-| **Procedural 3D World** ([`assets/geometry.js`](assets/geometry.js)) | Ridged multifractal mountain valley, curved Bianhe river, 20-segment interlocking timber Rainbow Bridge with stalls & pedestrians, 10 multi-tier hip-and-gable Song pavilions, organic multi-cluster weeping willows & pines, 3 Penglai floating peaks with waterfalls, 3 gliding riverboats, 9 flapping cranes, and a smooth-normal sculpted 32-ring Giant Kun. |
-| **Two-Pass MRT WebGL2 NPR** ([`assets/engine.js`](assets/engine.js)) | **Pass 1** outputs 3 MRT buffers simultaneously (`tColor`, `tNormDepth`, and barycentric AA `tWire`) with vertex-shader swimming/wing animations, anisotropic cliff brushwork (*Fu-Pi Cun* 斧劈皴), procedural window mullions, and aerial cloud-sea mist. **Pass 2** runs dual-channel Sobel depth+normal ink outlining with subtle UV ink-bleed jitter, procedural antique Xuan-paper fibers, and the split wireframe curtain. |
-| **Procedural Audio** ([`assets/audio.js`](assets/audio.js)) | Native Web Audio API Guqin pitch-slide plucking, integer-overtone bell harmonics, stereo valley delay reverb, filtered wind noise, and `DynamicsCompressorNode`. |
+All ~65,000 triangles, textures, brushstrokes, water reflections, shadows, and Guqin acoustics are procedurally synthesized in pure JavaScript and GLSL ES 3.00:
+
+1. **Pass 1 — Sun Directional Soft Shadow Map (`1024×1024` `DEPTH_COMPONENT24`)**
+   - 5-tap PCF soft shadows across the karst peaks, wooden Rainbow Bridge, curved Song pavilions, and stone piers.
+2. **Pass 2 — True Planar Mirror Water Reflection (`0.5×` FBO)**
+   - Renders the scene mirrored across `y = 0` with fragment plane clipping; the Bianhe River samples the reflection FBO warped by dual-octave scrolling ink-water ripples + Schlick Fresnel + sun/moon specular shimmer.
+3. **Pass 3 — Full-Res MRT Main Scene (`tColor`, `tData`, `tWire`)**
+   - **Karst Gorge & *千里江山圖* Mineral Shading**: `152×152` ridged-multifractal terrain with anisotropic *Fu-Pi Cun* (斧劈皴) rock brushwork, mineral azurite/malachite/ochre strata, gold-leaf sunlit crests, and height-stratified valley mist.
+   - **Hero Song Architecture**: Parabolic interlocking timber Rainbow Bridge (`汴水虹橋`) with continuous sloped vermilion railings, hanging lanterns, oiled-paper parasols, sweeping concave upturned-eave pavilions (`飛檐翹角`), octagonal waterside pavilion, cliff tower, and cloud pagoda.
+   - **GPU Calligraphic Brushstroke Foliage**: Procedurally painted pine needle fans, fountain-arched weeping willow cascades, autumn cinnabar maples, and wind-bent waterside reeds (`FS_FOLIAGE`) — zero primitive sphere trees.
+   - **Ethereal Spirit Kun & Sea of Clouds**: 44-ring smooth-normal celestial whale-leviathan with gossamer silk-filigree wings, drifting valley cloud ribbons, multi-strand cliff waterfalls, and 1,050 glowing spirit embers & fireflies.
+4. **Pass 4 — Quarter-Res Volumetric Sun God-Rays + Separable Gaussian Bloom**
+   - 18-step screen-space radial crepuscular shafts piercing through mountain gaps & under the Rainbow Bridge, blended with 9-tap separable bloom on lanterns, lit windows, and Kun runes.
+5. **Pass 5 — Adaptive Painterly Kuwahara Filter + Song Paper + Live 3D Split Curtain**
+   - 4-sector Kuwahara brushwork smoothing modulated by material type, delicate dry-brush calligraphic edge accents (fading cleanly in mist), antique Xuan-paper fiber warmth, ACES filmic grading, and a live barycentric 3D wireframe curtain.
 
 ---
 
-## Run & Verify Locally
+## Controls
+
+- **Mouse / Touch Drag**: 360° First-Person Free-Look (works in Free Fly, River Cruise, and Cloud Soar!)
+- **Mouse Wheel / `W A S D` / Arrow Keys**: Smooth first-person flight (`Space`/`E` up, `Shift`/`Q` down) with automatic terrain, water & bridge collision safety
+- **`X` Key**: Toggle 50% Song Painting ↔ 3D Wireframe split curtain
+- **`1` / `2` / `3` Keys**: Switch between Song Jade (`北宋青綠`), Sumi-e Ink (`煙雨焦墨`), and Lantern Night (`上元夜燈`)
+- **`R` Key**: Reset first-person viewpoint
+
+---
+
+## Local Run & Verification
 
 ```bash
-python tests/verify_scroll.py
 python -m http.server 8080
-# Open http://localhost:8080/ (zh-Hant) or http://localhost:8080/?lang=en
+# Open http://localhost:8080/
+python tests/verify_scroll.py
 ```
 
 ---
 
-## Credits & License
+## Credits & Ecosystem
 
-* **Autonomous Code, 3D Geometry & GLSL Shaders**: **Gemini 4 Neon** (Google)
-* **Concept & Direction**: **Purple Maple (紫楓 / [@tbpfs1](https://x.com/tbpfs1))** — [ai-purplemaple.com](https://ai-purplemaple.com/) · [Purple Maple Press (`/learn`)](https://ai-purplemaple.com/learn/)
-* **License**: [MIT License](LICENSE)
+- **Creator & Art Direction**: [紫楓 (Purple Maple)](https://ai-purplemaple.com/) · [Purple Maple Press `/learn/`](https://ai-purplemaple.com/learn/) · [@tbpfs1](https://x.com/tbpfs1)
+- **Autonomous Engineering**: Gemini 4 Neon
+- **License**: [MIT](LICENSE)

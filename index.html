@@ -13,32 +13,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>山海汴京圖｜走進清明上河圖 × 山海經 3D 即時水墨世界 (WebGL2)</title>
-<meta name="description" content="第一秒以為是宋代青綠水墨古卷，下一秒直接破畫飛入 3D 世界：穿過清明上河圖木拱虹橋、仰望山海經北冥巨鯤游過蓬萊飛瀑。零外部套件純 WebGL2 雙 Pass 水墨著色器，由 Gemini 4 Neon 全自動打造。">
+<meta name="description" content="第一秒以為是宋代青綠水墨古卷，下一秒第一人稱破畫飛入即時 3D 山河：泛舟穿越汴河虹橋倒影、仰望雲海北冥巨鯤與飛檐樓閣。零外部依賴純 WebGL2 五段水墨管線，由 Gemini 4 Neon 全自動打造。">
 <link rel="canonical" href="https://tbpfs.github.io/shan-hai-scroll-3d/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="山海汴京圖｜清明上河圖 × 山海經 3D 即時水墨世界">
-<meta property="og:description" content="不是圖片，是活著的 3D 水墨世界。由 Gemini 4 Neon 全自動以純 WebGL2 零依賴寫成：泛舟穿過宋代虹橋、御鯤巡天，並可即時拉開 3D 線框幕簾。">
+<meta property="og:description" content="不是平面古畫，是可 360° 第一人稱自由飛行的 3D 水墨世界：即時水面倒影、太陽軟陰影、水墨點葉筆刷、體積雲海與耶穌光。由 Gemini 4 Neon 零依賴純 WebGL2 打造。">
 <meta property="og:url" content="https://tbpfs.github.io/shan-hai-scroll-3d/">
 <meta property="og:image" content="https://tbpfs.github.io/shan-hai-scroll-3d/assets/og-cover.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="山海汴京圖 WebGL2 即時 3D 宋代青綠水墨世界，展示清明上河圖虹橋與山海經北冥巨鯤">
+<meta property="og:image:alt" content="山海汴京圖 v2 WebGL2 即時 3D 宋代青綠水墨世界，展示汴河虹橋水面倒影、千里青綠山嵐與山海經流光巨鯤">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@tbpfs1">
 <meta name="twitter:creator" content="@tbpfs1">
 <meta name="twitter:title" content="Shan Hai Bianjing 3D — Step Inside a Living Song-Dynasty Ink Scroll">
-<meta name="twitter:description" content="Looks like a classic Chinese ink painting — until you drag the camera and sail right through the 3D Rainbow Bridge beneath a flying Shan Hai Jing Kun. 100% pure WebGL2 by Gemini 4 Neon.">
+<meta name="twitter:description" content="First-person 3D Song-dynasty ink world built in pure zero-dependency WebGL2 by Gemini 4 Neon: live planar water reflections, PCF shadows, calligraphic brush foliage, volumetric mist & Spirit Kun.">
 <meta name="twitter:image" content="https://tbpfs.github.io/shan-hai-scroll-3d/assets/og-cover.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20261126-r1">
+<link rel="stylesheet" href="assets/style.css?v=20261126-v2">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareSourceCode",
   "name": "Shan Hai Bianjing 3D (山海汴京圖)",
-  "description": "Zero-dependency pure WebGL2 real-time Song-Dynasty ink-wash 3D world combining Qingming Scroll's Rainbow Bridge with Shan Hai Jing's Giant Mythical Kun and Penglai floating peaks, autonomously built by Gemini 4 Neon.",
+  "description": "Zero-dependency pure WebGL2 5-pass Song-Dynasty painterly ink-wash 3D world with first-person exploration, planar water reflections, PCF shadows, GPU calligraphic foliage, volumetric sun god-rays, and Kuwahara brushwork filter — autonomously built by Gemini 4 Neon.",
   "url": "https://tbpfs.github.io/shan-hai-scroll-3d/",
   "codeRepository": "https://github.com/tbpfs/shan-hai-scroll-3d",
   "programmingLanguage": ["JavaScript", "GLSL", "HTML", "CSS"],
@@ -55,17 +55,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <body>
 <canvas id="glCanvas" aria-label="山海汴京圖 3D 即時水墨世界畫布"></canvas>
 
-<!-- 開場裝裱細絹框 -->
+<!-- 細緻宋絹裝裱內框 -->
 <div class="scroll-mount" aria-hidden="true"></div>
 
-<!-- 左上低調銘牌 -->
+<!-- 入畫前低調角落印記（不干擾古畫構圖） -->
+<div class="opening-credit">
+  <span class="credit-dot" aria-hidden="true"></span>
+  <span>100% BUILT BY GEMINI 4 NEON · PURE WEBGL2 · 0 DEPS</span>
+</div>
+
+<!-- 入畫後左上極簡墨玉狀態牌 -->
 <header class="top-plaque">
   <span class="plaque-seal" aria-hidden="true"></span>
   <span class="plaque-brand" data-zh="山海汴京圖" data-en="SHAN HAI BIANJING 3D">山海汴京圖</span>
   <span class="plaque-divider" aria-hidden="true"></span>
-  <span class="plaque-meta">100% BUILT BY GEMINI 4 NEON · PURE WEBGL2 · 0 DEPS</span>
+  <span class="plaque-meta">GEMINI 4 NEON · PURE WEBGL2 · 0 DEPS</span>
   <span class="plaque-divider" aria-hidden="true"></span>
-  <span class="plaque-stats" id="statsReadout">-- TRIS · 60 FPS</span>
+  <span class="plaque-stats" id="statsReadout">-- TRIS</span>
 </header>
 
 <!-- 右上入畫後連結 -->
@@ -75,162 +81,194 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <a class="mini-link" href="https://github.com/tbpfs/shan-hai-scroll-3d" target="_blank" rel="noopener">GitHub</a>
 </nav>
 
-<!-- 右上古畫豎排題跋與朱砂印章（入畫後如墨淡出） -->
+<!-- 右上古典豎排題跋與朱砂閒章（入畫後如煙淡出） -->
 <aside class="colophon" aria-hidden="true">
   <h1 class="colophon-title">山海汴京圖</h1>
-  <p class="colophon-sub">汴河虹橋・北冥巨鯤・蓬萊飛瀑</p>
+  <p class="colophon-sub">清明虹橋・千里青綠・北冥巨鯤</p>
   <div class="seals">
     <span class="seal-stamp solid">紫楓<br>監製</span>
     <span class="seal-stamp">霓虹<br>入畫</span>
   </div>
 </aside>
 
-<!-- 開場「踏入畫卷」主按鈕 -->
+<!-- 開場「踏入畫卷」浮動印鈕 -->
 <div class="enter-stage">
   <button type="button" class="enter-btn" id="btnEnter" data-zh="踏入畫卷" data-en="ENTER THE 3D SCROLL">踏入畫卷</button>
-  <span class="enter-hint" data-zh="看起來是宋代古畫——按一下、拖曳或滾輪，直接走進 3D 水墨世界" data-en="Looks like a 2D Song scroll — click, drag, or scroll to fly inside the live 3D ink world">看起來是宋代古畫——按一下、拖曳或滾輪，直接走進 3D 水墨世界</span>
+  <span class="enter-hint" data-zh="第一人稱自由漫遊 · 拖曳 360° 環顧 · 滾輪 / WASD 穿越虹橋與雲海" data-en="First-person 3D ink world · Drag to look 360° · Scroll or WASD to fly under the bridge">第一人稱自由漫遊 · 拖曳 360° 環顧 · 滾輪 / WASD 穿越虹橋與雲海</span>
 </div>
 
 <!-- 3D 幕簾對照浮標 -->
 <div class="curtain-handle" id="curtainHandle" aria-hidden="true">
-  <span class="curtain-pill left" data-zh="水墨古卷 NPR" data-en="INK NPR">水墨古卷 NPR</span>
-  <span class="curtain-pill right" data-zh="3D 幾何線框" data-en="3D WIREFRAME">3D 幾何線框</span>
+  <span class="curtain-pill left" data-zh="宋畫水墨渲染" data-en="SONG INK PAINTING">宋畫水墨渲染</span>
+  <span class="curtain-pill right" data-zh="3D 拓撲線框" data-en="3D WIREFRAME">3D 拓撲線框</span>
 </div>
 
-<!-- 底部極簡宣紙控制細帶 -->
+<!-- 底部極簡墨玉控制列（入畫後浮現） -->
 <div class="dock" role="toolbar" aria-label="視角與水墨控制列">
-  <div class="dock-group" role="group" aria-label="鏡頭模式">
-    <button type="button" class="dock-btn active" data-mode="vista" data-zh="古卷遠眺" data-en="Scroll Vista">古卷遠眺</button>
-    <button type="button" class="dock-btn" data-mode="boat" data-zh="泛舟過虹橋" data-en="Sail Bridge">泛舟過虹橋</button>
-    <button type="button" class="dock-btn" data-mode="kun" data-zh="御鯤巡天" data-en="Ride the Kun">御鯤巡天</button>
-    <button type="button" class="dock-btn" data-mode="free" data-zh="自由飛行 (WASD)" data-en="Free Fly (WASD)">自由飛行 (WASD)</button>
+  <div class="dock-group" role="group" aria-label="第一人稱視角">
+    <button type="button" class="dock-btn active" data-mode="free" data-zh="自由漫遊 (WASD)" data-en="Free Fly (FPS)">自由漫遊 (WASD)</button>
+    <button type="button" class="dock-btn" data-mode="cruise" data-zh="畫舫穿橋" data-en="River Cruise">畫舫穿橋</button>
+    <button type="button" class="dock-btn" data-mode="soar" data-zh="御鯤凌雲" data-en="Cloud Soar">御鯤凌雲</button>
+    <button type="button" class="dock-btn subtle" id="btnReset" title="Reset View (R)" data-zh="復位" data-en="Reset">復位</button>
   </div>
   <span class="dock-sep" aria-hidden="true"></span>
   <div class="dock-group" role="group" aria-label="水墨意境">
     <button type="button" class="dock-btn active" data-style="bluegreen" data-zh="北宋青綠" data-en="Song Jade">北宋青綠</button>
-    <button type="button" class="dock-btn" data-style="mono" data-zh="焦墨寫意" data-en="Sumi-e Ink">焦墨寫意</button>
-    <button type="button" class="dock-btn" data-style="night" data-zh="山海夜燈" data-en="Lantern Night">山海夜燈</button>
+    <button type="button" class="dock-btn" data-style="mono" data-zh="煙雨焦墨" data-en="Sumi-e Ink">煙雨焦墨</button>
+    <button type="button" class="dock-btn" data-style="night" data-zh="上元夜燈" data-en="Lantern Night">上元夜燈</button>
   </div>
   <span class="dock-sep" aria-hidden="true"></span>
   <div class="curtain-wrap">
-    <span class="curtain-label" data-zh="破畫 3D 線框" data-en="3D WIRE">破畫 3D 線框</span>
+    <span class="curtain-label" data-zh="破畫 3D" data-en="3D X-RAY">破畫 3D</span>
     <input id="curtainSlider" type="range" min="0" max="100" value="0" aria-label="水墨與 3D 線框分割幕簾">
   </div>
   <span class="dock-sep" aria-hidden="true"></span>
   <button type="button" class="dock-btn" id="btnAudio" data-zh="撫琴：關" data-en="Guqin: OFF">撫琴：關</button>
 </div>
 
-<script src="assets/geometry.js?v=20261126-r1"></script>
-<script src="assets/engine.js?v=20261126-r1"></script>
-<script src="assets/audio.js?v=20261126-r1"></script>
+<noscript>
+  <div class="noscript-fallback">
+    <h2>山海汴京圖 (Shan Hai Bianjing 3D)</h2>
+    <p>本作品為純 WebGL2 五段式即時 3D 水墨引擎，請開啟瀏覽器 JavaScript 與 WebGL2 硬體加速體驗完整互動畫卷。</p>
+  </div>
+</noscript>
+
+<script src="assets/geometry.js?v=20261126-v2"></script>
+<script src="assets/audio.js?v=20261126-v2"></script>
+<script src="assets/engine.js?v=20261126-v2"></script>
 <script>
-(function () {
+(() => {
   "use strict";
   const canvas = document.getElementById("glCanvas");
+  const body = document.body;
   const statsEl = document.getElementById("statsReadout");
   const curtainSlider = document.getElementById("curtainSlider");
   const curtainHandle = document.getElementById("curtainHandle");
   const btnAudio = document.getElementById("btnAudio");
   const btnLang = document.getElementById("btnLang");
+  const btnEnter = document.getElementById("btnEnter");
+  const btnReset = document.getElementById("btnReset");
 
-  let isEn = (new URLSearchParams(location.search).get("lang") || "").toLowerCase() === "en";
-  let engine = null;
-
-  try {
-    engine = ShanHaiEngine.create(canvas, (st) => {
-      statsEl.textContent = `${st.tris.toLocaleString()} TRIS · ${st.fps} FPS`;
-    });
-  } catch (err) {
-    const div = document.createElement("div");
-    div.className = "fallback-msg";
-    div.innerHTML = `<div><h2>WebGL2 Required</h2><p>${err.message}</p></div>`;
-    document.body.appendChild(div);
-    return;
-  }
+  let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "zh";
+  let audioOn = false;
 
   function applyLang() {
-    document.documentElement.lang = isEn ? "en" : "zh-Hant";
-    btnLang.textContent = isEn ? "繁中" : "EN";
+    document.documentElement.lang = lang === "en" ? "en" : "zh-Hant";
+    btnLang.textContent = lang === "en" ? "繁中" : "EN";
     document.querySelectorAll("[data-zh]").forEach((el) => {
-      if (el === btnAudio) return;
-      el.textContent = isEn ? el.dataset.en : el.dataset.zh;
+      el.textContent = lang === "en" ? el.dataset.en : el.dataset.zh;
     });
-    syncAudioBtn();
+    updateAudioLabel();
   }
 
-  function syncAudioBtn() {
-    const on = ShanHaiAudio.isPlaying();
-    btnAudio.classList.toggle("accent-on", on);
-    btnAudio.textContent = isEn ? (on ? "Guqin: ON" : "Guqin: OFF") : (on ? "撫琴：開" : "撫琴：關");
+  function updateAudioLabel() {
+    btnAudio.textContent = lang === "en"
+      ? (audioOn ? "Guqin: ON" : "Guqin: OFF")
+      : (audioOn ? "撫琴：開" : "撫琴：關");
+    btnAudio.classList.toggle("active", audioOn);
   }
 
-  function syncBodyState() {
-    document.body.classList.toggle("is-entered", engine.state.entered);
-    document.body.classList.toggle("mood-night", engine.state.style === "night");
-    document.querySelectorAll("[data-mode]").forEach((b) => {
-      b.classList.toggle("active", b.dataset.mode === engine.state.mode);
-    });
-    document.querySelectorAll("[data-style]").forEach((b) => {
-      b.classList.toggle("active", b.dataset.style === engine.state.style);
-    });
-    const wirePct = Math.round((1 - engine.state.targetCurtain) * 100);
-    curtainSlider.value = String(wirePct);
-    const activeSplit = wirePct > 2 && wirePct < 98;
-    curtainHandle.classList.toggle("visible", activeSplit);
-    curtainHandle.style.left = `${(100 - wirePct)}%`;
+  function syncModeButtons(mode) {
+    document.querySelectorAll("[data-mode]").forEach((b) => b.classList.toggle("active", b.dataset.mode === mode));
   }
 
-  engine.setOnAutoEnter(syncBodyState);
+  function syncStyleButtons(style) {
+    document.querySelectorAll("[data-style]").forEach((b) => b.classList.toggle("active", b.dataset.style === style));
+  }
 
-  document.getElementById("btnEnter").addEventListener("click", () => {
+  function syncCurtainUI(curtainFrac) {
+    const pct = Math.round((1 - curtainFrac) * 100);
+    curtainSlider.value = String(pct);
+    const active = curtainFrac > 0.03 && curtainFrac < 0.97;
+    curtainHandle.classList.toggle("visible", active);
+    curtainHandle.style.left = (curtainFrac * 100).toFixed(2) + "%";
+  }
+
+  function markEntered() {
+    body.classList.add("is-entered");
+  }
+
+  const engine = ShanHaiEngine.create(canvas, {
+    onEnter: markEntered,
+    onModeChange: syncModeButtons,
+    onStats: ({ fps, tris }) => {
+      const fpsPart = fps >= 15 ? ` · ${fps} FPS` : "";
+      statsEl.textContent = `${tris.toLocaleString()} TRIS${fpsPart}`;
+    }
+  });
+
+  // Sync URL query params into UI state
+  if (engine.state.entered) markEntered();
+  syncModeButtons(engine.state.mode);
+  syncStyleButtons(engine.state.style);
+  syncCurtainUI(engine.state.curtain);
+
+  btnEnter.addEventListener("click", () => {
+    markEntered();
     engine.enterScroll();
-    ShanHaiAudio.playEnterChime();
-    syncBodyState();
+  });
+
+  btnReset.addEventListener("click", () => {
+    markEntered();
+    engine.resetView();
+    syncModeButtons("free");
   });
 
   document.querySelectorAll("[data-mode]").forEach((btn) => {
     btn.addEventListener("click", () => {
+      markEntered();
       engine.setMode(btn.dataset.mode);
-      syncBodyState();
+      syncModeButtons(btn.dataset.mode);
     });
   });
 
   document.querySelectorAll("[data-style]").forEach((btn) => {
     btn.addEventListener("click", () => {
+      markEntered();
       engine.setStyle(btn.dataset.style);
-      syncBodyState();
+      syncStyleButtons(btn.dataset.style);
     });
   });
 
   curtainSlider.addEventListener("input", () => {
-    const wirePct = Number(curtainSlider.value);
-    engine.setCurtain(1 - wirePct / 100);
-    if (!engine.state.entered && wirePct > 0) engine.state.entered = true;
-    syncBodyState();
+    markEntered();
+    const frac = 1.0 - Number(curtainSlider.value) / 100.0;
+    engine.setCurtain(frac);
+    syncCurtainUI(frac);
   });
 
   btnAudio.addEventListener("click", () => {
-    ShanHaiAudio.toggle();
-    syncAudioBtn();
+    audioOn = ShanHaiAudio.toggle();
+    updateAudioLabel();
   });
 
   btnLang.addEventListener("click", () => {
-    isEn = !isEn;
+    lang = lang === "zh" ? "en" : "zh";
     applyLang();
   });
 
-  // Keyboard shortcut: X toggles 50% wireframe split curtain!
+  // Keyboard shortcuts: X toggles 50% 3D X-Ray split curtain; R resets view; 1/2/3 switch moods
   window.addEventListener("keydown", (e) => {
-    if (e.key.toLowerCase() === "x") {
+    const k = e.key.toLowerCase();
+    if (k === "x") {
+      markEntered();
       const next = engine.state.targetCurtain > 0.75 ? 0.5 : 1.0;
       engine.setCurtain(next);
-      engine.state.entered = true;
-      syncBodyState();
+      syncCurtainUI(next);
+    } else if (k === "r") {
+      markEntered();
+      engine.resetView();
+      syncModeButtons("free");
+    } else if (k === "1") {
+      engine.setStyle("bluegreen"); syncStyleButtons("bluegreen");
+    } else if (k === "2") {
+      engine.setStyle("mono"); syncStyleButtons("mono");
+    } else if (k === "3") {
+      engine.setStyle("night"); syncStyleButtons("night");
     }
   });
 
   applyLang();
-  syncBodyState();
 })();
 </script>
 </body>

@@ -1,12 +1,12 @@
 /**
- * 《山海汴京圖》v3 — Fine-Art Splash-Ink & Xuan-Paper WebGL2 Engine
- * Built for pure painterly fine art — hiding every WebGL polygon limit through:
- *   - Domain-Warped Splash-Ink Mineral Mountain Shading (張大千潑彩 × 千里江山金碧)
- *   - Mountain Base Mist Dissolution into Luminous Xuan Paper (山腳留白・雲斷山腰)
- *   - True Planar Mirror Ink-Water + Concentric Ripples around the Lone Boatman (孤舟漣漪)
- *   - Capillary Xuan-Paper Ink-Bleed UV Displacement + Watercolor Wet-Edge Pooling (水痕邊)
- *   - Adaptive 4-Sector Painterly Kuwahara Brushwork + Gold-Flecked Xuan Paper (灑金宣紙)
- *   - Unobstructed 360° First-Person Exploration + Guided River Cruise & Cloud Kun Soar
+ * 《山海汴京圖》v4 — Vast 4-Realm Fine-Art Splash-Ink WebGL2 Engine & 7 Living Creatures
+ * Features:
+ *   - 380m x 400m Explorable Fine-Art Song World with Live Realm Discovery Whisper
+ *   - 7 Animated Mythic Creatures: 70m Winged Yinglong Dragon, Twin Celestial Kuns, 3 Vermilion Phoenixes,
+ *     2 Nine-Tailed Spirit Foxes, 2 Golden-Antlered Spirit Stags, 28 Leaping Spirit Koi, 18 Ink Cranes + 4 Lantern Boats
+ *   - Preserves v3 Museum Aesthetics: Splash-Ink Mineral Washes, Mountain-Base Mist Dissolution,
+ *     True Planar Mirror Water + Boatman Ripples, Capillary Xuan-Paper Ink-Bleed, Wet-Edge Pooling & Gold-Flecked Paper
+ *   - Unobstructed 360° First-Person Flight (Shift Wind-Boost!) + 4 Guided Mythic Realm Tours
  *
  * 100% Zero External Dependencies · Native WebGL2 + GLSL ES 3.00 · Built by Gemini 4 Neon
  */
@@ -88,7 +88,7 @@ const ShanHaiEngine = (() => {
   }
 
   /* ==========================================================================
-     2. Shared Museum Palette & Paper-Mist GLSL Helpers
+     2. Shared Museum Palette & Extended Long-Range Paper-Mist GLSL
      ========================================================================== */
   const GLSL_COMMON = /* glsl */`
     float hash12(vec2 p) {
@@ -116,25 +116,22 @@ const ShanHaiEngine = (() => {
       return v;
     }
 
-    // Strict Museum Fine-Art Paper & Negative-Space Sky Palette (60% luminous Xuan paper!)
     vec3 getPaperColor(float nightV, float monoV) {
-      vec3 xuanJade = vec3(0.935, 0.892, 0.798); // Warm aged Imperial Xuan paper (灑金宣紙)
-      vec3 xuanMono = vec3(0.945, 0.915, 0.848); // Crisp Song-Yuan gallery paper
-      vec3 xuanNgt  = vec3(0.065, 0.115, 0.195); // Nocturnal Lapis-Obsidian Silk
+      vec3 xuanJade = vec3(0.935, 0.892, 0.798);
+      vec3 xuanMono = vec3(0.945, 0.915, 0.848);
+      vec3 xuanNgt  = vec3(0.065, 0.115, 0.195);
       vec3 c = mix(xuanJade, xuanNgt, nightV);
       return mix(c, xuanMono, monoV);
     }
 
     vec3 getSkyColor(vec3 dir, vec3 sunDir, float nightV, float monoV) {
       float h = clamp(dir.y, -0.1, 1.0);
-      // Style 1 (潑彩青綠): Luminous Warm Xuan Paper melting upward into soft antique pale celadon silk!
       vec3 dayHor = vec3(0.955, 0.905, 0.795);
       vec3 dayMid = vec3(0.875, 0.885, 0.822);
       vec3 dayTop = vec3(0.665, 0.768, 0.758);
       vec3 dayCol = mix(dayHor, dayMid, smoothstep(0.0, 0.30, h));
       dayCol = mix(dayCol, dayTop, smoothstep(0.26, 0.85, h));
 
-      // Style 3 (幽冥青燈): Midnight Lapis-Indigo Silk with warm horizon breath
       vec3 ngtHor = vec3(0.085, 0.145, 0.235);
       vec3 ngtMid = vec3(0.045, 0.085, 0.165);
       vec3 ngtTop = vec3(0.015, 0.032, 0.075);
@@ -142,14 +139,9 @@ const ShanHaiEngine = (() => {
       ngtCol = mix(ngtCol, ngtTop, smoothstep(0.28, 0.85, h));
 
       vec3 col = mix(dayCol, ngtCol, nightV);
-
-      // Style 2 (墨韻丹砂): Pure Gallery Xuan Paper Wash
-      vec3 monoHor = vec3(0.955, 0.922, 0.852);
-      vec3 monoTop = vec3(0.845, 0.822, 0.768);
-      vec3 monoCol = mix(monoHor, monoTop, smoothstep(0.0, 0.82, h));
+      vec3 monoCol = mix(vec3(0.955, 0.922, 0.852), vec3(0.845, 0.822, 0.768), smoothstep(0.0, 0.82, h));
       col = mix(col, monoCol, monoV);
 
-      // Subtle atmospheric solar/lunar glow
       float sunCos = max(dot(normalize(dir), normalize(sunDir)), 0.0);
       vec3 glowCol = mix(vec3(1.0, 0.74, 0.42), vec3(0.55, 0.76, 0.98), nightV);
       glowCol = mix(glowCol, vec3(0.98, 0.56, 0.36), monoV);
@@ -157,35 +149,28 @@ const ShanHaiEngine = (() => {
       return col;
     }
 
-    // Painterly Song Negative-Space Mist (雲斷山腰・山腳留白 — erases all 3D polygon horizons!)
+    // Extended Open-World Song Mist (reveals colossal distant landmarks like Mount Buzhou Gate & Dragon across 260m!)
     vec3 applyInkMist(vec3 col, vec3 worldPos, vec3 camPos, vec3 sunDir, float nightV, float monoV, float isTerrain) {
       vec3 v = worldPos - camPos;
       float dist = length(v);
       vec3 dir = v / max(dist, 0.001);
 
-      // Crisp near-mid readability, then layered receding ink-wash veil!
-      float distFog = 1.0 - exp(-pow(max(dist - 22.0, 0.0) * 0.0102, 1.32));
-
-      // CRITICAL FINE-ART SECRET: Mountain waists & bases past 32m dissolve into pure Xuan-paper mist (山腳留白!)
-      // So distant peak summits float poetically above misty white paper, creating infinite 2D-scroll depth!
-      float farWeight = smoothstep(26.0, 56.0, dist);
-      float baseDissolve = isTerrain * farWeight * (1.0 - smoothstep(0.8, 17.5 + dist * 0.08, worldPos.y)) * 0.92;
-      float lowValleyMist = exp(-max(worldPos.y - 0.8, 0.0) * 0.115) * smoothstep(24.0, 68.0, dist) * 0.68;
+      float distFog = 1.0 - exp(-pow(max(dist - 24.0, 0.0) * 0.0078, 1.32));
+      float farWeight = smoothstep(32.0, 74.0, dist);
+      float baseDissolve = isTerrain * farWeight * (1.0 - smoothstep(0.8, 19.0 + dist * 0.055, worldPos.y)) * 0.90;
+      float lowValleyMist = exp(-max(worldPos.y - 0.8, 0.0) * 0.105) * smoothstep(28.0, 82.0, dist) * 0.65;
 
       float fogAmt = clamp(max(distFog, max(baseDissolve, lowValleyMist)), 0.0, 0.95);
-
       float sunAmt = pow(max(dot(dir, normalize(sunDir)), 0.0), 4.0);
       vec3 paper = getPaperColor(nightV, monoV);
       vec3 warmSunMist = mix(vec3(0.99, 0.89, 0.72), vec3(0.22, 0.34, 0.48), nightV);
       warmSunMist = mix(warmSunMist, vec3(0.98, 0.92, 0.82), monoV);
-      vec3 mistCol = mix(paper, warmSunMist, sunAmt * 0.45);
-
-      return mix(col, mistCol, fogAmt);
+      return mix(col, mix(paper, warmSunMist, sunAmt * 0.45), fogAmt);
     }
   `;
 
   /* ==========================================================================
-     3. Shaders
+     3. Shaders (Including Unified Multi-Species Mythic Spirit Shader!)
      ========================================================================== */
   const VS_SHADOW = `#version 300 es
     precision highp float;
@@ -196,7 +181,7 @@ const ShanHaiEngine = (() => {
     uniform float uTime;
     void main() {
       vec3 pos = aPos;
-      if (aExtra.x > 8.5 && aExtra.z > 0.05) pos.y += sin(uTime * 5.2 + aExtra.z * 2.0) * aExtra.z * 0.55;
+      if (aExtra.x > 8.5 && aExtra.x < 9.5 && aExtra.z > 0.05) pos.y += sin(uTime * 5.2 + aExtra.z * 2.0) * aExtra.z * 0.55;
       gl_Position = uLightVP * uModel * vec4(pos, 1.0);
     }
   `;
@@ -205,7 +190,6 @@ const ShanHaiEngine = (() => {
     void main() {}
   `;
 
-  // --- Sky Dome: Antique Gold-Flecked Silk Scroll Sky + Vermilion Imperial Sun / Pale Ivory Moon ---
   const VS_SKY = `#version 300 es
     precision highp float;
     out vec2 vNDC;
@@ -235,7 +219,6 @@ const ShanHaiEngine = (() => {
       vec3 sunD = normalize(uSunDir);
       vec3 col = getSkyColor(dir, sunD, uNight, uMono);
 
-      // Subtle dry-brush mineral ink wash bands drifting high across the Xuan paper sky
       if (dir.y > 0.01) {
         vec2 cuv = dir.xz / (dir.y + 0.28) * 0.55 + vec2(uTime * 0.003, -uTime * 0.0015);
         float c1 = fbm2(cuv * 1.3);
@@ -246,21 +229,15 @@ const ShanHaiEngine = (() => {
         col = mix(col, washTint, wash * 0.26);
       }
 
-      // Iconic Vermilion-Gold Sun Seal (Day / Sumi-e) OR Luminous Ivory Full Moon (Night!)
       float cosA = dot(dir, sunD);
       float disc = smoothstep(0.9980, 0.9989, cosA);
       float halo = pow(max(cosA, 0.0), 140.0);
-      // Cinnabar-vermilion painted sun disc (instant Chinese scroll signature!)
-      vec3 daySun = vec3(0.88, 0.28, 0.19);
-      vec3 ngtMoon = vec3(0.96, 0.96, 0.92);
-      vec3 discCol = mix(daySun, ngtMoon, uNight);
+      vec3 discCol = mix(vec3(0.88, 0.28, 0.19), vec3(0.96, 0.96, 0.92), uNight);
       discCol = mix(discCol, vec3(0.86, 0.20, 0.16), uMono);
-      // Soft wet-ink bleed around sun disc edge
       float sunEdge = smoothstep(0.9968, 0.9984, cosA) * (1.0 - disc);
       col = mix(col, discCol, disc * 0.86 + sunEdge * 0.28);
       col += mix(vec3(1.0, 0.68, 0.38), vec3(0.55, 0.78, 1.0), uNight) * halo * 0.48;
 
-      // Subtle constellations in Nocturnal Lapis mode
       if (uNight > 0.05 && dir.y > 0.08) {
         vec2 suv = floor(dir.xz / (dir.y + 0.18) * 145.0);
         float st = hash12(suv);
@@ -269,13 +246,12 @@ const ShanHaiEngine = (() => {
       }
 
       float skyEm = disc * mix(0.45, 0.95, uNight) + halo * 0.35;
-      oColor = vec4(col, 0.0); // alpha = 0 marks Sky!
+      oColor = vec4(col, 0.0);
       oData  = vec4(0.5, 0.5, 1.0, 0.0);
       oWire  = vec4(0.04, 0.0, clamp(skyEm, 0.0, 1.0), 1.0);
     }
   `;
 
-  // --- Main Solid World: Splash-Ink Karst Mountains + Calligraphic Song Architecture ---
   const VS_SOLID = `#version 300 es
     precision highp float;
     layout(location=0) in vec3 aPos;
@@ -299,22 +275,20 @@ const ShanHaiEngine = (() => {
 
     void main() {
       vec3 pos = aPos;
-      // Crane wings flap (matId == 9.0)
-      if (aExtra.x > 8.5 && aExtra.z > 0.05) {
+      // Crane wing flap (matId == 9.0)
+      if (aExtra.x > 8.5 && aExtra.x < 9.5 && aExtra.z > 0.05) {
         pos.y += sin(uTime * 5.2 + aExtra.z * 2.0) * aExtra.z * 0.55;
       }
-      // Fluttering Cinnabar Silk Ribbons on Rainbow Bridge & Pavilion (matId == 8.0)
+      // Fluttering Lantern Silk Tassels (matId == 8.0)
       if (aExtra.x > 7.5 && aExtra.x < 8.5) {
         float t = aExtra.y;
-        pos.x += sin(uTime * 2.8 - t * 4.5 + pos.z) * t * 0.48;
-        pos.z += cos(uTime * 2.1 - t * 3.8 + pos.x) * t * 0.25;
+        pos.x += sin(uTime * 2.8 - t * 4.5 + pos.z) * t * 0.25;
+        pos.z += cos(uTime * 2.1 - t * 3.8 + pos.x) * t * 0.14;
       }
       vec4 wp = uModel * vec4(pos, 1.0);
       vWorldPos = wp.xyz;
       vNorm = normalize(mat3(uModel) * aNorm);
-      vCol = aCol;
-      vBary = aBary;
-      vExtra = aExtra;
+      vCol = aCol; vBary = aBary; vExtra = aExtra;
       vLightPos = uLightVP * wp;
       gl_Position = uProj * uView * wp;
     }
@@ -359,76 +333,46 @@ const ShanHaiEngine = (() => {
 
     void main() {
       if (uClipY > 0.5 && vWorldPos.y < -0.15) discard;
-
-      vec3 N = normalize(vNorm);
-      vec3 V = normalize(uCamPos - vWorldPos);
-      vec3 L = normalize(uSunDir);
-      float matId = vExtra.x;
-      float ao = clamp(vExtra.w, 0.35, 1.0);
-      float emissive = 0.0;
-      float edgeCtrl = 0.85;
+      vec3 N = normalize(vNorm), V = normalize(uCamPos - vWorldPos), L = normalize(uSunDir);
+      float matId = vExtra.x, ao = clamp(vExtra.w, 0.35, 1.0), emissive = 0.0, edgeCtrl = 0.85;
       vec3 litCol;
 
-      // =========================================================================
-      // MATERIAL 0: TRUE FINE-ART SPLASH-INK KARST MOUNTAINS (張大千潑彩 × 千里江山!)
-      // ZERO plastic 3D Lambert lighting — PURE ink-wash tonal gradation & gold-leaf rims!
-      // =========================================================================
       if (matId < 0.5) {
         edgeCtrl = 0.48;
-        float h = vWorldPos.y;
-        float slope = 1.0 - clamp(N.y, 0.0, 1.0);
-
-        // 2-Stage Domain-Warped Splash-Ink Watercolor Bloom (潑墨潑彩水暈!)
+        float h = vWorldPos.y, slope = 1.0 - clamp(N.y, 0.0, 1.0);
         vec2 mp = vec2(vWorldPos.x * 0.042 + vWorldPos.z * 0.032, h * 0.075);
         vec2 q = vec2(fbm2(mp), fbm2(mp + vec2(5.2, 1.3)));
         float splash = fbm2(mp + 2.9 * q);
-
-        // Sweeping Vertical Calligraphic Fu-Pi Cun Rock Brushwork (斧劈皴飛白!)
-        vec2 cunUV = vec2(vWorldPos.x * 0.16 + vWorldPos.z * 0.16, h * 0.44) + q * 0.85;
-        float cun = fbm2(cunUV);
+        float cun = fbm2(vec2(vWorldPos.x * 0.16 + vWorldPos.z * 0.16, h * 0.44) + q * 0.85);
         float dryStroke = smoothstep(0.28, 0.78, cun);
-
-        // Ink-Wash Tonal Separation: Top Crests = Concentrated Dark Ink & Jewel Mineral; Bases = Soft Paper Wash!
-        float crestDark = smoothstep(2.0, 26.0, h);
+        float crestDark = smoothstep(2.0, 28.0, h);
         float sunFace = dot(N, L) * 0.5 + 0.5;
-        // Soft ink-wash quantization (墨分五色: breaks up smooth plastic 3D polygon gradients!)
         float inkStep = mix(sunFace, floor(sunFace * 4.5 + cun * 0.9) / 4.5, 0.38);
 
-        // --- Palette 1: Splash-Ink Mineral Jade, Lapis Azurite, Sumi Ink & Gold-Leaf (潑彩青綠) ---
-        vec3 sumiInk   = vec3(0.06, 0.10, 0.14); // Velvety charred Sumi pine-soot ink (焦墨)
-        vec3 malachite = vec3(0.08, 0.44, 0.40); // Zhang Daqian mineral turquoise-malachite (石綠)
-        vec3 azurite   = vec3(0.07, 0.25, 0.46); // Wang Ximeng deep lapis azurite (石青)
-        vec3 ochreWash = vec3(0.54, 0.43, 0.28); // Delicate warm ochre underpainting ONLY on sunlit shoulders!
-        vec3 paperMist = vec3(0.92, 0.88, 0.78);
-
-        // Pool mineral turquoise & azurite organically across the rock like wet-on-wet ink!
         float camDist = length(vWorldPos - uCamPos);
-        float nearCrag = 1.0 - smoothstep(42.0, 64.0, camDist);
+        float nearCrag = 1.0 - smoothstep(42.0, 66.0, camDist);
+
+        vec3 sumiInk   = vec3(0.06, 0.10, 0.14);
+        vec3 malachite = vec3(0.08, 0.44, 0.40);
+        vec3 azurite   = vec3(0.07, 0.25, 0.46);
+        vec3 ochreWash = vec3(0.54, 0.43, 0.28);
+        vec3 paperMist = vec3(0.92, 0.88, 0.78);
 
         vec3 mineral = mix(malachite, azurite, smoothstep(0.28, 0.70, splash + crestDark * 0.38));
         mineral = mix(mineral, ochreWash, smoothstep(0.62, 0.90, sunFace) * (1.0 - crestDark * 0.70) * 0.32);
-        // Deep calligraphic Fu-Pi Cun dark ink on near crags & steep cliff shadows (NEVER pale white snow mounds!)
         vec3 jadeMount = mix(sumiInk, mineral, 0.28 + 0.72 * inkStep * dryStroke);
-        // Near bridge crags stay rich sculpted charcoal-jade rock; ONLY mid/far mountains fade low waists into paper!
         float lowFade = smoothstep(0.0, 10.5, h);
         float baseWashAmt = (1.0 - lowFade) * (1.0 - nearCrag * 0.86);
         jadeMount = mix(jadeMount, mix(paperMist, vec3(0.24, 0.42, 0.44), 0.32 + 0.25 * dryStroke), baseWashAmt * 0.68);
 
-        // Iconic Fine Gold-Leaf Ridge Highlight (金碧山水泥金勾勒!)
         float rimView = pow(1.0 - max(dot(N, V), 0.0), 2.4);
         float goldLine = smoothstep(0.42, 0.84, sunFace) * smoothstep(4.0, 20.0, h) * (rimView * 0.80 + smoothstep(0.64, 0.90, cun) * 0.45);
         jadeMount += vec3(0.82, 0.60, 0.24) * goldLine * 0.82;
 
-        // --- Palette 3: Nocturnal Lapis-Obsidian with Molten Gold-Leaf Silhouettes (幽冥青燈) ---
-        vec3 ngtDark = vec3(0.025, 0.055, 0.105);
-        vec3 ngtMid  = vec3(0.075, 0.165, 0.265);
-        vec3 ngtMount = mix(ngtDark, ngtMid, inkStep * dryStroke * (0.4 + 0.6 * crestDark));
-        float moonGold = rimView * smoothstep(3.5, 19.0, h) * (0.45 + 0.55 * sunFace);
-        ngtMount += mix(vec3(0.85, 0.68, 0.34), vec3(0.42, 0.72, 0.95), 0.42) * moonGold * 0.85;
-
+        vec3 ngtMount = mix(vec3(0.025, 0.055, 0.105), vec3(0.075, 0.165, 0.265), inkStep * dryStroke * (0.4 + 0.6 * crestDark));
+        ngtMount += mix(vec3(0.85, 0.68, 0.34), vec3(0.42, 0.72, 0.95), 0.42) * rimView * smoothstep(3.5, 19.0, h) * (0.45 + 0.55 * sunFace) * 0.85;
         litCol = mix(jadeMount, ngtMount, uNight);
 
-        // --- Palette 2: Black-Myth Pure Sumi-e Ink Wash (墨韻丹砂: 焦濃重淡清!) ---
         if (uMono > 0.01) {
           float nearInkBoost = mix(lowFade, 0.92, nearCrag);
           float inkDensity = clamp(0.20 + 0.80 * (1.0 - inkStep * 0.56) * (0.45 + 0.55 * dryStroke) * (0.42 + 0.58 * nearInkBoost), 0.0, 1.0);
@@ -437,65 +381,48 @@ const ShanHaiEngine = (() => {
           litCol = mix(litCol, sumiWash, uMono);
         }
 
-        // Delicate waterline mist feather right where rock meets calm mirror water (y = 0..0.75)
         float waterEdge = 1.0 - smoothstep(-0.2, 0.78, h);
         litCol = mix(litCol, getPaperColor(uNight, uMono) * mix(0.86, 1.08, uNight), waterEdge * 0.46);
-
         litCol = applyInkMist(litCol, vWorldPos, uCamPos, L, uNight, uMono, 1.0 - nearCrag * 0.72);
-      }
-      // =========================================================================
-      // ARCHITECTURAL SILHOUETTES, LANTERNS, RIBBONS, LONE BOATMAN & CRANES
-      // =========================================================================
-      else {
+      } else {
         vec3 albedo = vCol;
         if (matId < 1.5) {
-          // Glazed dark-ink ceramic Song roof tiles
           float rib = sin(vExtra.y * 6.28318 * 1.4) * 0.5 + 0.5;
           albedo *= (0.78 + 0.32 * rib);
           vec3 H = normalize(L + V);
           albedo += mix(vec3(0.95, 0.78, 0.44), vec3(0.55, 0.74, 0.96), uNight) * pow(max(dot(N, H), 0.0), 26.0) * 0.45;
         } else if (matId > 3.5 && matId < 4.5) {
-          // Radiant Warm Cinnabar Lanterns & Candlelit Pavilion Screens
           float flick = 0.93 + 0.07 * sin(uTime * 3.6 + vWorldPos.x * 1.8 + vWorldPos.z * 1.3);
           float gx = abs(fract(vWorldPos.x * 2.5 + vWorldPos.z * 2.5) - 0.5);
           float gy = abs(fract(vWorldPos.y * 2.7) - 0.5);
           float mull = smoothstep(0.41, 0.48, max(gx, gy));
-          vec3 glow = mix(vec3(1.0, 0.66, 0.28), vec3(1.0, 0.52, 0.18), uNight * 0.45) * flick * mix(1.08, 1.58, uNight);
+          vec3 glow = mix(albedo * 1.15, vec3(1.0, 0.56, 0.20), uNight * 0.35) * flick * mix(1.06, 1.55, uNight);
           albedo = mix(glow, vec3(0.12, 0.09, 0.08), mull * 0.48 * step(0.85, vExtra.w));
           emissive = mix(0.75, 1.0, uNight) * (1.0 - mull * 0.32);
         } else if (matId > 7.5 && matId < 8.5) {
-          // Fluttering Cinnabar Silk Ribbon — blazing fine-art focal red!
-          albedo = vec3(0.86, 0.17, 0.14) * (0.85 + 0.25 * sin(vExtra.y * 6.0 - uTime * 3.0));
-          emissive = mix(0.18, 0.45, uNight);
+          albedo = vec3(0.86, 0.17, 0.14);
+          emissive = mix(0.18, 0.42, uNight);
         } else {
-          float grain = fbm2(vec2(vWorldPos.x * 2.2 + vWorldPos.z * 2.2, vWorldPos.y * 1.2));
-          albedo *= (0.84 + 0.28 * grain);
+          albedo *= (0.84 + 0.28 * fbm2(vec2(vWorldPos.x * 2.2 + vWorldPos.z * 2.2, vWorldPos.y * 1.2)));
         }
 
         float shadow = (matId > 3.5 && matId < 4.5) ? 1.0 : calcShadow(vLightPos, N, L);
         float ndl = max(dot(N, L), 0.0);
         vec3 sunC = mix(vec3(1.08, 0.90, 0.66), vec3(0.38, 0.52, 0.80), uNight);
         vec3 ambC = mix(vec3(0.56, 0.62, 0.62), vec3(0.12, 0.18, 0.28), uNight);
-
-        // Warm lantern bounce on bridge & pavilion timbers!
         float dBridge = length(vWorldPos - vec3(0.0, 6.0, -19.0));
         float dPav = length(vWorldPos - vec3(-16.8, 7.5, -18.5));
         vec3 warmB = vec3(1.0, 0.48, 0.18) * (exp(-dBridge * 0.09) * 0.8 + exp(-dPav * 0.12) * 0.7) * mix(0.16, 0.92, uNight);
 
-        litCol = (matId > 3.5 && matId < 4.5)
-          ? albedo
-          : albedo * (ambC * 0.75 + sunC * (ndl * shadow * 0.82 + 0.16)) * ao + warmB * albedo;
-
-        // Black-Myth Sumi-e Mode: Crisp Jet Ink Silhouettes + BLAZING Cinnabar Vermilion Accents!
+        litCol = (matId > 3.5 && matId < 4.5) ? albedo : albedo * (ambC * 0.75 + sunC * (ndl * shadow * 0.82 + 0.16)) * ao + warmB * albedo;
         if (uMono > 0.01) {
           float lum = dot(litCol, vec3(0.299, 0.587, 0.114));
           vec3 inkA = mix(vec3(0.07, 0.08, 0.10), vec3(0.88, 0.85, 0.78), smoothstep(0.04, 0.88, lum));
           float isRed = smoothstep(0.16, 0.36, litCol.r - max(litCol.g, litCol.b));
-          if (matId > 3.5 && matId < 4.5) inkA = mix(vec3(0.95, 0.32, 0.18), vec3(1.0, 0.66, 0.32), 0.35);
+          if (matId > 3.5 && matId < 4.5) inkA = mix(vec3(0.95, 0.34, 0.18), vec3(1.0, 0.70, 0.34), 0.35);
           else inkA = mix(inkA, vec3(0.86, 0.16, 0.13), isRed * 0.95);
           litCol = mix(litCol, inkA, uMono);
         }
-
         litCol = applyInkMist(litCol, vWorldPos, uCamPos, L, uNight, uMono, 0.0);
       }
 
@@ -503,15 +430,175 @@ const ShanHaiEngine = (() => {
       vec3 a3 = smoothstep(vec3(0.0), fw * 1.35, vBary);
       float wire = 1.0 - min(min(a3.x, a3.y), a3.z);
       float clay = clamp((dot(N, normalize(vec3(0.4, 0.8, 0.4))) * 0.45 + 0.55) * ao, 0.15, 1.0);
-      float linDepth = clamp(length(vWorldPos - uCamPos) / 165.0, 0.0, 1.0);
-
       oColor = vec4(litCol, 1.0);
-      oData  = vec4(N.x * 0.5 + 0.5, N.z * 0.5 + 0.5, linDepth, edgeCtrl);
+      oData  = vec4(N.x * 0.5 + 0.5, N.z * 0.5 + 0.5, clamp(length(vWorldPos - uCamPos) / 280.0, 0.0, 1.0), edgeCtrl);
       oWire  = vec4(clay, wire, emissive, 0.0);
     }
   `;
 
-  // --- Infinite Mirror Xuan-Paper Ink Water + Lone Boatman Concentric Ink Ripples! ---
+  // --- UNIFIED MYTHIC SPIRIT CREATURE SHADER (Kun 7 | Yinglong Dragon 10 | Vermilion Phoenix 11 | Nine-Tailed Fox 12!) ---
+  const VS_SPIRIT = `#version 300 es
+    precision highp float;
+    layout(location=0) in vec3 aPos;
+    layout(location=1) in vec3 aNorm;
+    layout(location=2) in vec3 aCol;
+    layout(location=3) in vec3 aBary;
+    layout(location=4) in vec4 aExtra; // [speciesId, spineS, wingOrTailU, chordOrIdx]
+
+    uniform mat4 uModel;
+    uniform mat4 uView;
+    uniform mat4 uProj;
+    uniform float uTime;
+
+    out vec3 vWorldPos;
+    out vec3 vNorm;
+    out vec3 vCol;
+    out vec3 vBary;
+    out vec4 vExtra;
+
+    void main() {
+      vec3 pos = aPos;
+      float sp = aExtra.x, s = aExtra.y, wU = aExtra.z, cV = aExtra.w;
+
+      if (sp < 8.5) {
+        // 7.0: Celestial Giant Kun — sweeping whale undulation + silk wing wave
+        float ph = uTime * 1.45 - s * 4.2;
+        pos.y += sin(ph) * (0.30 + s * 1.25);
+        pos.x += cos(ph * 0.72) * (0.14 + s * 0.70);
+        if (wU > 0.04) { float w = max(0.0, wU - 0.06); pos.y += sin(uTime * 1.55 - w * 2.4 - cV * 1.2) * (w * w * 2.6); }
+      } else if (sp < 10.5) {
+        // 10.0: 70m Winged Yinglong Sky-Dragon — dramatic sinuous 3D serpentine wave + wing beats!
+        float ph = uTime * 2.05 - s * 10.2;
+        pos.x += sin(ph) * (0.35 + s * 4.2);
+        pos.y += cos(ph * 0.85) * (0.28 + s * 2.6);
+        if (wU > 0.04) { float w = max(0.0, wU - 0.06); pos.y += sin(uTime * 2.2 - w * 2.0 - cV) * (w * w * 3.8); }
+      } else if (sp < 11.5) {
+        // 11.0: Vermilion Phoenix — stately wing beats + 5 billowing ribbon tails!
+        if (s > 0.35) {
+          float tWave = uTime * 3.8 - s * 6.5;
+          pos.y += sin(tWave) * (s - 0.35) * 1.35;
+          pos.x += cos(tWave * 0.75) * (s - 0.35) * 0.75;
+        } else if (wU > 0.04) {
+          float w = max(0.0, wU - 0.06);
+          pos.y += sin(uTime * 3.6 - w * 1.8) * (w * 2.35);
+        }
+      } else {
+        // 12.0: Qingqiu Nine-Tailed Spirit Fox — 9 translucent silk tails gently undulating like mist fans!
+        if (wU > 0.08) {
+          float tailPh = uTime * 1.85 - s * 3.4 + cV * 6.283;
+          pos.x += sin(tailPh) * s * 0.95;
+          pos.y += cos(tailPh * 0.8) * s * 0.55;
+        }
+      }
+
+      vec4 wp = uModel * vec4(pos, 1.0);
+      vWorldPos = wp.xyz;
+      vNorm = normalize(mat3(uModel) * aNorm);
+      vCol = aCol; vBary = aBary; vExtra = aExtra;
+      gl_Position = uProj * uView * wp;
+    }
+  `;
+
+  const FS_SPIRIT = `#version 300 es
+    precision highp float;
+    in vec3 vWorldPos;
+    in vec3 vNorm;
+    in vec3 vCol;
+    in vec3 vBary;
+    in vec4 vExtra;
+
+    uniform vec3 uCamPos;
+    uniform vec3 uSunDir;
+    uniform float uTime;
+    uniform float uNight;
+    uniform float uMono;
+    uniform float uClipY;
+
+    ${GLSL_COMMON}
+    layout(location=0) out vec4 oColor;
+    layout(location=1) out vec4 oData;
+    layout(location=2) out vec4 oWire;
+
+    void main() {
+      if (uClipY > 0.5 && vWorldPos.y < -0.15) discard;
+      vec3 N = normalize(vNorm); if (!gl_FrontFacing) N = -N;
+      vec3 V = normalize(uCamPos - vWorldPos), L = normalize(uSunDir);
+      float sp = vExtra.x, s = vExtra.y, wU = vExtra.z, cV = vExtra.w;
+
+      float flow = fbm2(vec2(s * 6.8 - uTime * 0.30, wU * 4.2 + cV * 3.2));
+      float filigree = pow(1.0 - abs(sin((s * 22.0 - uTime * 1.05) + flow * 5.0)), 11.0);
+      float silkLines = pow(abs(sin(cV * 24.0 + flow * 3.0)), 12.0) * smoothstep(0.08, 0.45, wU);
+      float veins = clamp(filigree * 1.1 + silkLines * 0.65, 0.0, 1.0);
+      float fres = pow(1.0 - abs(dot(N, V)), 2.1);
+
+      vec3 col = vCol;
+      float alpha = 0.94;
+      float em = 0.25;
+
+      if (sp < 8.5) {
+        // KUN: Splash-ink azurite-turquoise & gold filigree
+        vec3 inkCore = mix(vec3(0.05, 0.13, 0.24), vec3(0.11, 0.46, 0.48), smoothstep(0.22, 0.82, flow));
+        vec3 goldL = vec3(0.96, 0.76, 0.36);
+        col = inkCore * (0.72 + 0.42 * max(dot(N, L), 0.0)) + goldL * veins * mix(0.75, 1.25, uNight)
+            + mix(vec3(0.24, 0.68, 0.72), vec3(0.48, 0.88, 1.0), uNight) * fres * mix(0.45, 0.95, uNight);
+        if (wU > 0.04) {
+          float tailEnd = 1.0 - smoothstep(1.02, 1.56, s);
+          alpha = clamp(smoothstep(0.04, 0.15, wU) * (1.0 - smoothstep(0.38, 0.96, wU)) * smoothstep(0.0, 0.16, cV) * (1.0 - smoothstep(0.55, 0.96, cV)) * tailEnd * (0.48 + 0.52 * flow) * 0.88, 0.0, 0.88);
+          if (alpha < 0.025) discard;
+          col = mix(col, mix(vec3(0.12, 0.44, 0.48), goldL, 0.38), wU * 0.55);
+        }
+        if (uMono > 0.01) col = mix(col, mix(vec3(0.07, 0.08, 0.10), vec3(0.32, 0.34, 0.36), flow) + vec3(0.92, 0.20, 0.15) * veins * 0.95, uMono);
+        em = clamp((veins * 0.7 + fres * 0.4) * mix(0.45, 1.0, uNight), 0.0, 1.0);
+      } else if (sp < 10.5) {
+        // YINGLONG DRAGON: Deep imperial obsidian-lapis scales + molten gold spine/antlers/filigree (strong daytime & night pop!)
+        float scales = smoothstep(0.32, 0.80, sin(s * 95.0) * sin(cV * 36.0) * 0.5 + 0.5);
+        vec3 dragonInk = mix(vec3(0.03, 0.09, 0.18), vec3(0.09, 0.34, 0.44), scales * 0.58 + flow * 0.42);
+        float isGoldPart = smoothstep(0.55, 0.82, vCol.r);
+        vec3 baseC = mix(dragonInk, vec3(0.92, 0.68, 0.24), isGoldPart);
+        col = baseC * (0.68 + 0.44 * max(dot(N, L), 0.0)) + vec3(1.0, 0.80, 0.34) * (veins * 0.72 + fres * 0.48);
+        if (wU > 0.04) {
+          alpha = clamp(smoothstep(0.04, 0.16, wU) * (1.0 - smoothstep(0.45, 0.98, wU)) * (0.50 + 0.50 * flow) * 0.88, 0.0, 0.88);
+          if (alpha < 0.025) discard;
+        }
+        if (uMono > 0.01) col = mix(col, mix(vec3(0.05, 0.06, 0.08), vec3(0.24, 0.26, 0.28), scales) + vec3(0.92, 0.20, 0.14) * (veins + isGoldPart) * 0.9, uMono);
+        em = clamp((veins * 0.65 + fres * 0.48 + isGoldPart * 0.42) * mix(0.38, 1.0, uNight), 0.0, 1.0);
+      } else if (sp < 11.5) {
+        // VERMILION PHOENIX: Rich Deep Cinnabar-Crimson Body & Wings + Gold Filigree Rim (vivid against bright Xuan sky!)
+        vec3 deepCrim = vec3(0.62, 0.06, 0.07);
+        vec3 brightVerm = vec3(0.86, 0.16, 0.10);
+        vec3 goldPlume = vec3(0.92, 0.56, 0.14);
+        vec3 phxCol = mix(deepCrim, brightVerm, smoothstep(0.25, 0.78, flow));
+        phxCol = mix(phxCol, goldPlume, smoothstep(0.55, 0.90, vCol.g) * 0.55);
+        col = phxCol * (0.72 + 0.34 * max(dot(N, L), 0.0)) + vec3(0.98, 0.68, 0.24) * (veins * 0.60 + fres * 0.35);
+        if (wU > 0.04) {
+          float tailFade = 1.0 - smoothstep(0.95, 1.52, s);
+          alpha = clamp(smoothstep(0.04, 0.14, wU) * (1.0 - smoothstep(0.45, 0.98, wU)) * tailFade * (0.68 + 0.32 * flow) * 0.96, 0.0, 0.96);
+          if (alpha < 0.025) discard;
+        }
+        em = clamp((0.28 + veins * 0.45) * mix(0.32, 1.0, uNight), 0.0, 1.0);
+      } else {
+        // QINGQIU NINE-TAILED FOX: Luminous Xuan-white silk fur + rich cinnabar-tipped volumetric tails!
+        vec3 bodyShade = mix(vec3(0.76, 0.78, 0.82), vec3(0.98, 0.95, 0.88), max(dot(N, L), 0.0) * 0.55 + 0.45);
+        vec3 foxC = mix(bodyShade, vec3(0.84, 0.15, 0.13), smoothstep(0.42, 0.76, s) + smoothstep(0.7, 0.9, vCol.r - vCol.g));
+        col = foxC + vec3(1.0, 0.84, 0.50) * fres * 0.52;
+        if (wU > 0.08) {
+          alpha = clamp((1.0 - smoothstep(0.68, 1.0, s)) * (0.72 + 0.28 * flow) * 0.92, 0.12, 0.92);
+        }
+        em = clamp((0.28 + fres * 0.48) * mix(0.35, 0.92, uNight), 0.0, 1.0);
+      }
+
+      col = applyInkMist(col, vWorldPos, uCamPos, L, uNight, uMono, 0.0);
+      vec3 fw = fwidth(vBary);
+      vec3 a3 = smoothstep(vec3(0.0), fw * 1.4, vBary);
+      float wire = 1.0 - min(min(a3.x, a3.y), a3.z);
+
+      oColor = vec4(col, alpha);
+      oData  = vec4(N.x * 0.5 + 0.5, N.z * 0.5 + 0.5, clamp(length(vWorldPos - uCamPos) / 280.0, 0.0, 1.0), 0.14);
+      oWire  = vec4(0.62, wire, em, alpha);
+    }
+  `;
+
+  // --- Water, Foliage, Waterfall, Clouds, Particles, Bloom & Final Composite (Preserving v3 Museum Perfection!) ---
   const VS_WATER = `#version 300 es
     precision highp float;
     layout(location=0) in vec3 aPos;
@@ -522,20 +609,13 @@ const ShanHaiEngine = (() => {
     out vec3 vWorldPos;
     out vec3 vBary;
     out vec4 vRefClip;
-    void main() {
-      vWorldPos = aPos;
-      vBary = aBary;
-      vRefClip = uRefVP * vec4(aPos, 1.0);
-      gl_Position = uProj * uView * vec4(aPos, 1.0);
-    }
+    void main() { vWorldPos = aPos; vBary = aBary; vRefClip = uRefVP * vec4(aPos, 1.0); gl_Position = uProj * uView * vec4(aPos, 1.0); }
   `;
-
   const FS_WATER = `#version 300 es
     precision highp float;
     in vec3 vWorldPos;
     in vec3 vBary;
     in vec4 vRefClip;
-
     uniform sampler2D uReflectTex;
     uniform vec3 uCamPos;
     uniform vec3 uSunDir;
@@ -543,480 +623,234 @@ const ShanHaiEngine = (() => {
     uniform float uTime;
     uniform float uNight;
     uniform float uMono;
-
     ${GLSL_COMMON}
-
     layout(location=0) out vec4 oColor;
     layout(location=1) out vec4 oData;
     layout(location=2) out vec4 oWire;
-
     void main() {
-      vec3 V = normalize(uCamPos - vWorldPos);
-      vec3 L = normalize(uSunDir);
+      vec3 V = normalize(uCamPos - vWorldPos), L = normalize(uSunDir);
       float dist = length(vWorldPos - uCamPos);
       vec2 p = vWorldPos.xz;
-
-      // Delicate silky horizontal ink-brush ripples
       float w1 = fbm2(vec2(p.x * 0.34, p.y * 0.14 - uTime * 0.24));
       float w2 = fbm2(vec2(p.x * 0.72 + 4.1, p.y * 0.28 + uTime * 0.18));
       float rx = (w1 - 0.5) * 0.022 + (w2 - 0.5) * 0.012;
       float ry = (w2 - 0.5) * 0.014 + sin(p.y * 1.15 - uTime * 1.3 + w1 * 3.5) * 0.006;
-
-      // Concentric calligraphic ink ripple rings expanding around the Lone Boatman (孤舟漣漪!)
       float dBoat = length(p - uBoatPos.xz);
       float ringWave = sin(dBoat * 3.2 - uTime * 2.6) * exp(-dBoat * 0.14) * smoothstep(1.2, 2.8, dBoat);
-      rx += ringWave * 0.014;
-      ry += ringWave * 0.010;
-
+      rx += ringWave * 0.014; ry += ringWave * 0.010;
       vec3 N = normalize(vec3(rx * 4.0, 1.0, ry * 6.0));
-
-      // True Planar Mirror Reflection FBO
       vec2 refUV = (vRefClip.xy / max(vRefClip.w, 0.001)) * 0.5 + 0.5;
-      float damp = clamp(1.0 - dist * 0.0045, 0.25, 1.0);
-      vec2 wUV = clamp(refUV + vec2(rx, ry * 1.3) * damp, vec2(0.004), vec2(0.996));
-      vec3 refl = texture(uReflectTex, wUV).rgb;
-
-      // Serene Song Xuan-paper & pale celadon mirror water base (水天一色!)
+      float damp = clamp(1.0 - dist * 0.0035, 0.22, 1.0);
+      vec3 refl = texture(uReflectTex, clamp(refUV + vec2(rx, ry * 1.3) * damp, vec2(0.004), vec2(0.996))).rgb;
       vec3 paperBase = mix(vec3(0.76, 0.82, 0.78), vec3(0.035, 0.068, 0.125), uNight);
       paperBase = mix(paperBase, vec3(0.88, 0.86, 0.80), uMono);
-
       float fres = 0.28 + 0.68 * pow(1.0 - max(dot(N, V), 0.0), 2.8);
       vec3 col = mix(paperBase, refl * mix(0.96, 1.06, uNight), fres);
-
-      // Subtle painted ink ring highlight around the lone boatman!
-      float ringLine = smoothstep(0.45, 0.92, ringWave);
-      col = mix(col, mix(vec3(0.18, 0.28, 0.30), vec3(0.92, 0.80, 0.55), uNight), ringLine * 0.26);
-
-      // Shimmering sun/moon liquid gold brush glint!
+      col = mix(col, mix(vec3(0.18, 0.28, 0.30), vec3(0.92, 0.80, 0.55), uNight), smoothstep(0.45, 0.92, ringWave) * 0.26);
       vec3 H = normalize(L + V);
       float spec = pow(max(dot(N, H), 0.0), 120.0);
       vec3 glintC = mix(vec3(1.0, 0.80, 0.44), vec3(0.72, 0.84, 1.0), uNight);
       glintC = mix(glintC, vec3(0.98, 0.54, 0.34), uMono * 0.75);
       col += glintC * spec * 0.88;
-
-      // Seamless merge into infinite Xuan-paper mist horizon!
-      float horFade = 1.0 - exp(-pow(max(dist - 28.0, 0.0) * 0.0115, 1.42));
+      float horFade = 1.0 - exp(-pow(max(dist - 36.0, 0.0) * 0.0078, 1.38));
       col = mix(col, getPaperColor(uNight, uMono), clamp(horFade, 0.0, 0.98));
-
       float glow = clamp(spec * 0.45 + max(refl.r - 0.80, 0.0) * 1.2, 0.0, 0.55);
-      vec3 fw = fwidth(vBary);
-      vec3 a3 = smoothstep(vec3(0.0), fw * 1.35, vBary);
-      float wire = 1.0 - min(min(a3.x, a3.y), a3.z);
-
+      vec3 fw = fwidth(vBary); vec3 a3 = smoothstep(vec3(0.0), fw * 1.35, vBary);
       oColor = vec4(col, 1.0);
-      oData  = vec4(0.5, 0.5, clamp(dist / 165.0, 0.0, 1.0), 0.08);
-      oWire  = vec4(0.26, wire * 0.75, glow, 0.0);
+      oData  = vec4(0.5, 0.5, clamp(dist / 280.0, 0.0, 1.0), 0.08);
+      oWire  = vec4(0.26, (1.0 - min(min(a3.x, a3.y), a3.z)) * 0.75, glow, 0.0);
     }
   `;
 
-  // --- Calligraphic Silhouette Foliage (焦墨松針 / 朱砂丹楓) ---
   const VS_FOLIAGE = `#version 300 es
     precision highp float;
-    layout(location=0) in vec3 aCenter;
-    layout(location=1) in vec2 aOffset;
-    layout(location=2) in vec3 aNorm;
-    layout(location=3) in vec3 aCol;
-    layout(location=4) in vec4 aSeed;
-    uniform mat4 uView;
-    uniform mat4 uProj;
-    uniform float uTime;
-    out vec2 vUV;
-    out vec3 vWorldPos;
-    out vec3 vNorm;
-    out vec3 vCol;
-    out vec4 vSeed;
+    layout(location=0) in vec3 aCenter; layout(location=1) in vec2 aOffset; layout(location=2) in vec3 aNorm;
+    layout(location=3) in vec3 aCol; layout(location=4) in vec4 aSeed;
+    uniform mat4 uView; uniform mat4 uProj; uniform float uTime;
+    out vec2 vUV; out vec3 vWorldPos; out vec3 vNorm; out vec3 vCol; out vec4 vSeed;
     void main() {
       vec3 r = vec3(uView[0][0], uView[1][0], uView[2][0]);
       vec3 u = normalize(mix(vec3(uView[0][1], uView[1][1], uView[2][1]), vec3(0.0, 1.0, 0.0), 0.35));
       float sway = sin(uTime * 1.35 + aCenter.x * 0.35 + aSeed.x) * 0.14 * aSeed.z;
-      vec3 wp = aCenter + r * (aOffset.x + sway) + u * (aOffset.y * 0.82); // Horizontal Song pine pad ratio!
-      vWorldPos = wp;
-      vUV = aOffset / max(aSeed.w, 0.01);
-      vNorm = normalize(aNorm);
-      vCol = aCol;
-      vSeed = aSeed;
+      vec3 wp = aCenter + r * (aOffset.x + sway) + u * (aOffset.y * 0.82);
+      vWorldPos = wp; vUV = aOffset / max(aSeed.w, 0.01); vNorm = normalize(aNorm); vCol = aCol; vSeed = aSeed;
       gl_Position = uProj * uView * vec4(wp, 1.0);
     }
   `;
-
   const FS_FOLIAGE = `#version 300 es
     precision highp float;
-    in vec2 vUV;
-    in vec3 vWorldPos;
-    in vec3 vNorm;
-    in vec3 vCol;
-    in vec4 vSeed;
-    uniform vec3 uCamPos;
-    uniform vec3 uSunDir;
-    uniform float uNight;
-    uniform float uMono;
-    uniform float uClipY;
+    in vec2 vUV; in vec3 vWorldPos; in vec3 vNorm; in vec3 vCol; in vec4 vSeed;
+    uniform vec3 uCamPos; uniform vec3 uSunDir; uniform float uNight; uniform float uMono; uniform float uClipY;
     ${GLSL_COMMON}
-    layout(location=0) out vec4 oColor;
-    layout(location=1) out vec4 oData;
-    layout(location=2) out vec4 oWire;
-
+    layout(location=0) out vec4 oColor; layout(location=1) out vec4 oData; layout(location=2) out vec4 oWire;
     void main() {
       if (uClipY > 0.5 && vWorldPos.y < -0.15) discard;
       float bType = vSeed.y, seed = vSeed.x;
       float nTex = fbm2(vUV * 4.2 + vec2(seed, seed * 0.7));
       float ang = atan(vUV.y, vUV.x), rad = length(vUV * vec2(0.95, 1.25));
-      float br = (bType > 1.5)
-        ? sin(ang * 7.0 + seed) * 0.16
-        : sin(ang * 15.0 + seed) * 0.15 + sin(ang * 25.0 - seed) * 0.07;
+      float br = (bType > 1.5) ? sin(ang * 7.0 + seed) * 0.16 : sin(ang * 15.0 + seed) * 0.15 + sin(ang * 25.0 - seed) * 0.07;
       float alpha = 1.0 - smoothstep(0.36 + br, 0.92 + br, rad + (nTex - 0.5) * 0.42);
       if (alpha < 0.34) discard;
-
       vec3 N = normalize(vNorm), L = normalize(uSunDir);
-      // High-contrast wet-edge Chinese ink calligraphy pooling (dark ink rim, luminous mineral core!)
-      float wetEdge = smoothstep(0.68, 0.34, alpha);
-      float topLit = smoothstep(-0.75, 0.75, vUV.y);
-      vec3 col = mix(vCol * (0.95 + 0.35 * topLit), vCol * 0.32 + vec3(0.02, 0.04, 0.06), wetEdge * 0.65);
-      col *= (0.76 + 0.38 * nTex);
-      // Subtle sunlit gold rim on pine/maple tips
+      float wetEdge = smoothstep(0.68, 0.34, alpha), topLit = smoothstep(-0.75, 0.75, vUV.y);
+      vec3 col = mix(vCol * (0.95 + 0.35 * topLit), vCol * 0.32 + vec3(0.02, 0.04, 0.06), wetEdge * 0.65) * (0.76 + 0.38 * nTex);
       col += mix(vec3(0.32, 0.26, 0.10), vec3(0.42, 0.14, 0.08), step(1.5, bType)) * topLit * max(dot(N, L), 0.0) * (1.0 - uNight);
-
-      if (uNight > 0.01) {
-        vec3 ngtC = (bType > 1.5) ? vec3(0.55, 0.16, 0.18) : col * vec3(0.28, 0.42, 0.62);
-        col = mix(col, ngtC, uNight);
-      }
-      if (uMono > 0.01) {
-        vec3 inkF = (bType > 1.5)
-          ? mix(vec3(0.52, 0.10, 0.10), vec3(0.88, 0.20, 0.15), topLit * 0.6 + nTex * 0.4) // Blazing Cinnabar Maple!
-          : mix(vec3(0.06, 0.07, 0.09), vec3(0.26, 0.28, 0.30), topLit * 0.5 + nTex * 0.5); // Crisp Sumi Pine!
-        col = mix(col, inkF, uMono);
-      }
+      if (uNight > 0.01) col = mix(col, (bType > 1.5) ? vec3(0.55, 0.16, 0.18) : col * vec3(0.28, 0.42, 0.62), uNight);
+      if (uMono > 0.01) col = mix(col, (bType > 1.5) ? mix(vec3(0.52, 0.10, 0.10), vec3(0.88, 0.20, 0.15), topLit * 0.6 + nTex * 0.4) : mix(vec3(0.06, 0.07, 0.09), vec3(0.26, 0.28, 0.30), topLit * 0.5 + nTex * 0.5), uMono);
       col = applyInkMist(col, vWorldPos, uCamPos, L, uNight, uMono, 0.0);
-
-      float contour = smoothstep(0.58, 0.34, alpha) * 0.88;
       oColor = vec4(col, 1.0);
-      oData  = vec4(N.x * 0.5 + 0.5, N.z * 0.5 + 0.5, clamp(length(vWorldPos - uCamPos) / 165.0, 0.0, 1.0), 0.35);
-      oWire  = vec4(0.32 + topLit * 0.25, contour, (bType > 1.5 ? 0.18 : 0.0), 0.0);
+      oData  = vec4(N.x * 0.5 + 0.5, N.z * 0.5 + 0.5, clamp(length(vWorldPos - uCamPos) / 280.0, 0.0, 1.0), 0.35);
+      oWire  = vec4(0.32 + topLit * 0.25, smoothstep(0.58, 0.34, alpha) * 0.88, (bType > 1.5 ? 0.18 : 0.0), 0.0);
     }
   `;
 
-  // --- Colossal Splash-Ink Celestial Kun (潑墨流金北冥巨鯤!) ---
-  const VS_KUN = `#version 300 es
-    precision highp float;
-    layout(location=0) in vec3 aPos;
-    layout(location=1) in vec3 aNorm;
-    layout(location=2) in vec3 aCol;
-    layout(location=3) in vec3 aBary;
-    layout(location=4) in vec4 aExtra;
-    uniform mat4 uModel;
-    uniform mat4 uView;
-    uniform mat4 uProj;
-    uniform float uTime;
-    out vec3 vWorldPos;
-    out vec3 vNorm;
-    out vec3 vCol;
-    out vec3 vBary;
-    out vec4 vExtra;
-    void main() {
-      vec3 pos = aPos;
-      float s = aExtra.y, wU = aExtra.z;
-      float ph = uTime * 1.45 - s * 4.2;
-      pos.y += sin(ph) * (0.30 + s * 1.25);
-      pos.x += cos(ph * 0.72) * (0.14 + s * 0.70);
-      if (wU > 0.04) {
-        float w = max(0.0, wU - 0.06);
-        pos.y += sin(uTime * 1.55 - w * 2.4 - aExtra.w * 1.2) * (w * w * 2.6);
-      }
-      vec4 wp = uModel * vec4(pos, 1.0);
-      vWorldPos = wp.xyz;
-      vNorm = normalize(mat3(uModel) * aNorm);
-      vCol = aCol; vBary = aBary; vExtra = aExtra;
-      gl_Position = uProj * uView * wp;
-    }
-  `;
-
-  const FS_KUN = `#version 300 es
-    precision highp float;
-    in vec3 vWorldPos;
-    in vec3 vNorm;
-    in vec3 vCol;
-    in vec3 vBary;
-    in vec4 vExtra;
-    uniform vec3 uCamPos;
-    uniform vec3 uSunDir;
-    uniform float uTime;
-    uniform float uNight;
-    uniform float uMono;
-    uniform float uClipY;
-    ${GLSL_COMMON}
-    layout(location=0) out vec4 oColor;
-    layout(location=1) out vec4 oData;
-    layout(location=2) out vec4 oWire;
-
-    void main() {
-      if (uClipY > 0.5 && vWorldPos.y < -0.15) discard;
-      vec3 N = normalize(vNorm);
-      if (!gl_FrontFacing) N = -N;
-      vec3 V = normalize(uCamPos - vWorldPos);
-      vec3 L = normalize(uSunDir);
-      float s = vExtra.y, wU = vExtra.z, cV = vExtra.w;
-
-      // Calligraphic Sumi Splash-Ink + Flowing Liquid Gold-Leaf Filigree!
-      float flow = fbm2(vec2(s * 6.5 - uTime * 0.28, wU * 4.2 + cV * 3.2));
-      float filigree = pow(1.0 - abs(sin((s * 22.0 - uTime * 1.0) + flow * 5.0)), 11.0);
-      float silkLines = pow(abs(sin(cV * 24.0 + flow * 3.0)), 12.0) * smoothstep(0.08, 0.45, wU);
-      float veins = clamp(filigree * 1.1 + silkLines * 0.65, 0.0, 1.0);
-      float fres = pow(1.0 - abs(dot(N, V)), 2.2);
-
-      // Deep velvety ink-azurite body so it reads clearly against luminous Xuan paper sky!
-      vec3 inkCore = mix(vec3(0.05, 0.13, 0.24), vec3(0.11, 0.46, 0.48), smoothstep(0.22, 0.82, flow));
-      vec3 goldLeaf = vec3(0.96, 0.76, 0.36);
-      vec3 col = inkCore * (0.72 + 0.42 * max(dot(N, L), 0.0));
-      col += goldLeaf * veins * mix(0.75, 1.25, uNight);
-      col += mix(vec3(0.24, 0.68, 0.72), vec3(0.48, 0.88, 1.0), uNight) * fres * mix(0.45, 0.95, uNight);
-
-      float alpha = 0.92;
-      if (wU > 0.04) {
-        float rootF = smoothstep(0.04, 0.15, wU);
-        float tipF = 1.0 - smoothstep(0.38, 0.96, wU);
-        float leadF = smoothstep(0.0, 0.16, cV);
-        float trailF = 1.0 - smoothstep(0.55, 0.96, cV);
-        float tailEndFade = 1.0 - smoothstep(1.02, 1.56, s); // Smoothly dissolves phoenix silk tail tips into mist!
-        alpha = clamp(rootF * tipF * leadF * trailF * tailEndFade * (0.48 + 0.52 * flow) * 0.88, 0.0, 0.88);
-        if (alpha < 0.025) discard;
-        col = mix(col, mix(vec3(0.12, 0.44, 0.48), goldLeaf, 0.38), wU * 0.55);
-      }
-
-      if (uMono > 0.01) {
-        vec3 inkKun = mix(vec3(0.07, 0.08, 0.10), vec3(0.32, 0.34, 0.36), flow);
-        // Cinnabar red spirit meridians in Black-Myth Sumi-e mode!
-        inkKun += vec3(0.92, 0.20, 0.15) * veins * 0.95;
-        col = mix(col, inkKun, uMono);
-      }
-
-      col = applyInkMist(col, vWorldPos, uCamPos, L, uNight, uMono, 0.0);
-      float em = clamp((veins * 0.7 + fres * 0.4) * mix(0.45, 1.0, uNight), 0.0, 1.0);
-      vec3 fw = fwidth(vBary);
-      vec3 a3 = smoothstep(vec3(0.0), fw * 1.4, vBary);
-      float wire = 1.0 - min(min(a3.x, a3.y), a3.z);
-
-      oColor = vec4(col, alpha);
-      oData  = vec4(N.x * 0.5 + 0.5, N.z * 0.5 + 0.5, clamp(length(vWorldPos - uCamPos) / 165.0, 0.0, 1.0), 0.12);
-      oWire  = vec4(0.62, wire, em, alpha);
-    }
-  `;
-
-  // --- Silky Cliff Waterfall & Luminous Valley Mist Clouds ---
   const VS_WATERFALL = `#version 300 es
     precision highp float;
-    layout(location=0) in vec3 aPos;
-    layout(location=4) in vec4 aExtra;
-    uniform mat4 uView;
-    uniform mat4 uProj;
-    out vec3 vWorldPos;
-    out vec2 vUV;
+    layout(location=0) in vec3 aPos; layout(location=4) in vec4 aExtra;
+    uniform mat4 uView; uniform mat4 uProj;
+    out vec3 vWorldPos; out vec2 vUV;
     void main() { vWorldPos = aPos; vUV = aExtra.yz; gl_Position = uProj * uView * vec4(aPos, 1.0); }
   `;
   const FS_WATERFALL = `#version 300 es
     precision highp float;
-    in vec3 vWorldPos;
-    in vec2 vUV;
-    uniform vec3 uCamPos;
-    uniform vec3 uSunDir;
-    uniform float uTime;
-    uniform float uNight;
-    uniform float uMono;
-    uniform float uClipY;
+    in vec3 vWorldPos; in vec2 vUV;
+    uniform vec3 uCamPos; uniform vec3 uSunDir; uniform float uTime; uniform float uNight; uniform float uMono; uniform float uClipY;
     ${GLSL_COMMON}
-    layout(location=0) out vec4 oColor;
-    layout(location=1) out vec4 oData;
-    layout(location=2) out vec4 oWire;
+    layout(location=0) out vec4 oColor; layout(location=1) out vec4 oData; layout(location=2) out vec4 oWire;
     void main() {
       if (uClipY > 0.5 && vWorldPos.y < -0.1) discard;
       float ex = smoothstep(0.0, 0.25, vUV.x) * smoothstep(1.0, 0.75, vUV.x);
       float tf = smoothstep(0.0, 0.15, vUV.y) * smoothstep(1.0, 0.65, vUV.y);
-      float st = smoothstep(0.26, 0.80, fbm2(vec2(vUV.x * 6.5, vUV.y * 4.0 - uTime * 1.4)));
-      float alpha = ex * tf * (0.28 + 0.65 * st);
+      float alpha = ex * tf * (0.28 + 0.65 * smoothstep(0.26, 0.80, fbm2(vec2(vUV.x * 6.5, vUV.y * 4.0 - uTime * 1.4))));
       if (alpha < 0.04) discard;
-      vec3 col = mix(vec3(0.95, 0.93, 0.86), vec3(0.45, 0.64, 0.82), uNight);
-      col = applyInkMist(col, vWorldPos, uCamPos, normalize(uSunDir), uNight, uMono, 0.0);
-      oColor = vec4(col, alpha * 0.72);
-      oData  = vec4(0.5, 0.5, clamp(length(vWorldPos - uCamPos) / 165.0, 0.0, 1.0), 0.0);
-      oWire  = vec4(0.0, 0.0, 0.15, 0.0);
+      vec3 col = applyInkMist(mix(vec3(0.95, 0.93, 0.86), vec3(0.45, 0.64, 0.82), uNight), vWorldPos, uCamPos, normalize(uSunDir), uNight, uMono, 0.0);
+      oColor = vec4(col, alpha * 0.72); oData = vec4(0.5, 0.5, clamp(length(vWorldPos - uCamPos) / 280.0, 0.0, 1.0), 0.0); oWire = vec4(0.0, 0.0, 0.15, 0.0);
     }
   `;
 
   const VS_CLOUD = `#version 300 es
     precision highp float;
-    layout(location=0) in vec3 aCenter;
-    layout(location=1) in vec2 aOff;
-    layout(location=2) in vec2 aSize;
-    layout(location=3) in vec3 aMeta;
-    uniform mat4 uView;
-    uniform mat4 uProj;
-    uniform float uTime;
-    out vec2 vUV;
-    out vec3 vWorldPos;
-    out vec3 vMeta;
+    layout(location=0) in vec3 aCenter; layout(location=1) in vec2 aOff; layout(location=2) in vec2 aSize; layout(location=3) in vec3 aMeta;
+    uniform mat4 uView; uniform mat4 uProj; uniform float uTime;
+    out vec2 vUV; out vec3 vWorldPos; out vec3 vMeta;
     void main() {
-      vec3 r = vec3(uView[0][0], uView[1][0], uView[2][0]);
-      vec3 u = vec3(uView[0][1], uView[1][1], uView[2][1]);
+      vec3 r = vec3(uView[0][0], uView[1][0], uView[2][0]), u = vec3(uView[0][1], uView[1][1], uView[2][1]);
       vec3 c = aCenter + vec3(sin(uTime * 0.048 + aMeta.y) * 6.0, sin(uTime * 0.10 + aMeta.y) * 0.45, 0.0);
       vec3 wp = c + r * (aOff.x * aSize.x) + u * (aOff.y * aSize.y);
-      vWorldPos = wp; vUV = aOff; vMeta = aMeta;
-      gl_Position = uProj * uView * vec4(wp, 1.0);
+      vWorldPos = wp; vUV = aOff; vMeta = aMeta; gl_Position = uProj * uView * vec4(wp, 1.0);
     }
   `;
   const FS_CLOUD = `#version 300 es
     precision highp float;
-    in vec2 vUV;
-    in vec3 vWorldPos;
-    in vec3 vMeta;
-    uniform vec3 uCamPos;
-    uniform vec3 uSunDir;
-    uniform float uTime;
-    uniform float uNight;
-    uniform float uMono;
-    uniform float uClipY;
+    in vec2 vUV; in vec3 vWorldPos; in vec3 vMeta;
+    uniform vec3 uCamPos; uniform vec3 uSunDir; uniform float uTime; uniform float uNight; uniform float uMono; uniform float uClipY;
     ${GLSL_COMMON}
-    layout(location=0) out vec4 oColor;
-    layout(location=1) out vec4 oData;
-    layout(location=2) out vec4 oWire;
+    layout(location=0) out vec4 oColor; layout(location=1) out vec4 oData; layout(location=2) out vec4 oWire;
     void main() {
       if (uClipY > 0.5 && vWorldPos.y < 0.2) discard;
-      float dist = length(vWorldPos - uCamPos);
-      float nearF = smoothstep(6.0, 18.0, dist);
-      float r2 = dot(vUV, vUV);
+      float dist = length(vWorldPos - uCamPos), r2 = dot(vUV, vUV);
       if (r2 > 1.0) discard;
-      float rad = pow(1.0 - r2, 1.7);
       vec2 nuv = vUV * vec2(1.3, 2.2) + vec2(vMeta.y + uTime * 0.022, vMeta.y * 0.37);
       float n1 = fbm2(nuv);
-      float wisp = smoothstep(0.28, 0.78, fbm2(nuv * 2.0 + vec2(n1 * 1.2, -n1 * 0.6))) * rad;
-      float alpha = wisp * vMeta.x * nearF;
+      float alpha = smoothstep(0.28, 0.78, fbm2(nuv * 2.0 + vec2(n1 * 1.2, -n1 * 0.6))) * pow(1.0 - r2, 1.7) * vMeta.x * smoothstep(6.0, 20.0, dist);
       if (alpha < 0.015) discard;
       vec3 paper = getPaperColor(uNight, uMono);
       vec3 col = mix(paper * mix(0.95, 1.25, uNight), mix(vec3(0.99, 0.94, 0.84), vec3(0.24, 0.36, 0.52), uNight), smoothstep(-0.5, 0.7, vUV.y) * 0.65);
-      oColor = vec4(col, alpha);
-      oData  = vec4(0.5, 0.5, clamp(dist / 165.0, 0.0, 1.0), 0.0);
-      oWire  = vec4(0.0, 0.0, 0.0, 0.0);
+      oColor = vec4(col, alpha); oData = vec4(0.5, 0.5, clamp(dist / 280.0, 0.0, 1.0), 0.0); oWire = vec4(0.0);
     }
   `;
 
-  // --- Swirling 3D Cinnabar Maple Petals (落紅如雨), Gold-Leaf Dust & Sumi Ink Smoke! ---
   const VS_PARTICLES = `#version 300 es
     precision highp float;
-    layout(location=0) in vec3 aSeed;
-    layout(location=1) in vec3 aMeta;
-    uniform mat4 uView;
-    uniform mat4 uProj;
-    uniform vec3 uKunPos;
-    uniform vec3 uKunFwd;
-    uniform float uTime;
-    uniform float uDPR;
-    out float vKind;
-    out float vGlow;
-    out float vSpin;
+    layout(location=0) in vec3 aSeed; layout(location=1) in vec3 aMeta;
+    uniform mat4 uView; uniform mat4 uProj;
+    uniform vec3 uKunPos; uniform vec3 uKunFwd;
+    uniform vec3 uDrgPos; uniform vec3 uDrgFwd;
+    uniform vec3 uCamPos;
+    uniform float uTime; uniform float uDPR;
+    out float vKind; out float vGlow; out float vSpin;
     void main() {
       float kind = aMeta.z;
       vec3 wp;
       if (kind < 1.5) {
         float tr = fract(aSeed.x + uTime * (kind < 0.5 ? 0.10 : 0.075));
-        float sp = tr * 10.5 + aMeta.x;
-        float rad = 1.6 + tr * (kind < 0.5 ? 7.0 : 10.0) * (0.4 + 0.6 * aSeed.y);
+        float sp = tr * 10.5 + aMeta.x, rad = 1.6 + tr * (kind < 0.5 ? 7.0 : 10.0) * (0.4 + 0.6 * aSeed.y);
         vec3 side = normalize(cross(uKunFwd, vec3(0.0, 1.0, 0.0)) + vec3(0.001));
         wp = uKunPos - uKunFwd * (tr * 38.0 - 4.0) + side * (cos(sp) * rad) + vec3(0.0, sin(sp) * rad * 0.55 + (aSeed.z - 0.5) * 3.5, 0.0);
         vGlow = (1.0 - tr) * smoothstep(0.0, 0.12, tr);
-      } else {
-        // Swirling 3D Cinnabar Maple Petals drifting gracefully across the bridge & past the viewer!
-        float fall = fract(aSeed.y - uTime * 0.035);
-        float x = (aSeed.x * 2.0 - 1.0) * 36.0 + sin(uTime * 0.55 + aMeta.x) * 3.8 + uTime * 0.65;
-        x = mod(x + 36.0, 72.0) - 36.0;
-        float y = 0.8 + fall * 16.5 + sin(uTime * 1.1 + aMeta.x * 2.0) * 0.6;
-        float z = -34.0 + aSeed.z * 66.0 + cos(uTime * 0.42 + aMeta.x) * 2.6;
-        wp = vec3(x, y, z);
+      } else if (kind < 2.5) {
+        // Wrap swirling 3D Cinnabar Maple Petals smoothly around the player's current 80m region so EVERY realm has drifting petals!
+        float fall = fract(aSeed.y - uTime * 0.032);
+        vec3 local = vec3(
+          mod(aSeed.x * 84.0 + uTime * 0.85 - uCamPos.x + 42.0, 84.0) - 42.0,
+          0.8 + fall * 24.0,
+          mod(aSeed.z * 84.0 - uCamPos.z + 42.0, 84.0) - 42.0
+        );
+        wp = vec3(uCamPos.x + local.x + sin(uTime * 0.6 + aMeta.x) * 2.5, local.y, uCamPos.z + local.z + cos(uTime * 0.45 + aMeta.x) * 2.0);
         vGlow = smoothstep(0.0, 0.15, fall) * smoothstep(1.0, 0.85, fall);
+      } else {
+        // Golden celestial cloud sparks trailing the 70m Yinglong Sky-Dragon at Mount Buzhou!
+        float tr = fract(aSeed.x + uTime * 0.11);
+        float sp = tr * 14.0 + aMeta.x, rad = 2.2 + tr * 12.0 * (0.3 + 0.7 * aSeed.y);
+        vec3 side = normalize(cross(uDrgFwd, vec3(0.0, 1.0, 0.0)) + vec3(0.001));
+        wp = uDrgPos - uDrgFwd * (tr * 58.0 - 8.0) + side * (cos(sp) * rad) + vec3(0.0, sin(sp) * rad * 0.65, 0.0);
+        vGlow = (1.0 - tr) * smoothstep(0.0, 0.12, tr);
       }
       vec4 vp = uView * vec4(wp, 1.0);
       gl_Position = uProj * vp;
-      float dist = max(-vp.z, 2.0);
-      gl_PointSize = clamp((aMeta.y * 28.0 / dist) * uDPR, 2.0, 22.0);
-      vKind = kind;
-      vSpin = uTime * 1.8 + aMeta.x * 3.0;
+      gl_PointSize = clamp((aMeta.y * 28.0 / max(-vp.z, 2.0)) * uDPR, 2.0, 22.0);
+      vKind = kind; vSpin = uTime * 1.8 + aMeta.x * 3.0;
     }
   `;
-
   const FS_PARTICLES = `#version 300 es
     precision highp float;
-    in float vKind;
-    in float vGlow;
-    in float vSpin;
-    uniform float uNight;
-    uniform float uMono;
-    layout(location=0) out vec4 oColor;
-    layout(location=1) out vec4 oData;
-    layout(location=2) out vec4 oWire;
+    in float vKind; in float vGlow; in float vSpin;
+    uniform float uNight; uniform float uMono;
+    layout(location=0) out vec4 oColor; layout(location=1) out vec4 oData; layout(location=2) out vec4 oWire;
     void main() {
       vec2 c = gl_PointCoord - 0.5;
       vec3 col; float alpha; float em = 0.0;
-      if (vKind < 0.5) {
+      if (vKind < 0.5 || vKind > 2.5) {
         float r2 = dot(c, c) * 4.0; if (r2 > 1.0) discard;
-        float soft = pow(1.0 - r2, 2.0);
         col = mix(vec3(0.98, 0.78, 0.36), vec3(0.90, 0.24, 0.18), uMono * 0.85);
-        alpha = soft * vGlow * mix(0.70, 0.96, uNight);
+        alpha = pow(1.0 - r2, 2.0) * vGlow * mix(0.70, 0.96, uNight);
         em = alpha * 0.92;
       } else if (vKind < 1.5) {
         float r2 = dot(c, c) * 4.0; if (r2 > 1.0) discard;
         col = mix(vec3(0.08, 0.16, 0.24), vec3(0.10, 0.11, 0.13), uMono);
         alpha = pow(1.0 - r2, 1.8) * vGlow * 0.30;
       } else {
-        // Rotating organic tapered Cinnabar Maple Petal (落紅花瓣!) / Golden Fireflies at Night!
         float cs = cos(vSpin), sn = sin(vSpin);
         vec2 rc = vec2(c.x * cs - c.y * sn, c.x * sn + c.y * cs);
-        float d = length(vec2(rc.x * 2.2, rc.y * 4.2));
-        if (d > 1.0) discard;
-        float petal = smoothstep(1.0, 0.35, d);
+        float d = length(vec2(rc.x * 2.2, rc.y * 4.2)); if (d > 1.0) discard;
         col = mix(vec3(0.86, 0.20, 0.15), vec3(1.0, 0.74, 0.32), uNight * 0.85);
-        alpha = petal * vGlow * mix(0.82, 0.92, uNight);
+        alpha = smoothstep(1.0, 0.35, d) * vGlow * mix(0.82, 0.92, uNight);
         em = alpha * mix(0.12, 0.95, uNight);
       }
-      oColor = vec4(col, alpha);
-      oData  = vec4(0.5, 0.5, 0.5, 0.0);
-      oWire  = vec4(0.0, 0.0, em, alpha);
+      oColor = vec4(col, alpha); oData = vec4(0.5, 0.5, 0.5, 0.0); oWire = vec4(0.0, 0.0, em, alpha);
     }
   `;
 
-  // --- Pass 4: Volumetric Sun God-Rays + Separable Bloom ---
   const VS_QUAD = `#version 300 es
-    precision highp float;
-    out vec2 vUV;
-    void main() {
-      vec2 p = vec2((gl_VertexID == 1) ? 3.0 : -1.0, (gl_VertexID == 2) ? 3.0 : -1.0);
-      vUV = p * 0.5 + 0.5;
-      gl_Position = vec4(p, 0.0, 1.0);
-    }
+    precision highp float; out vec2 vUV;
+    void main() { vec2 p = vec2((gl_VertexID == 1) ? 3.0 : -1.0, (gl_VertexID == 2) ? 3.0 : -1.0); vUV = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }
   `;
-
   const FS_BLOOM_RAYS = `#version 300 es
-    precision highp float;
-    in vec2 vUV;
-    uniform sampler2D uColorTex;
-    uniform sampler2D uWireTex;
-    uniform vec2 uSunUV;
-    uniform float uSunVis;
-    uniform float uNight;
-    uniform float uMono;
+    precision highp float; in vec2 vUV;
+    uniform sampler2D uColorTex; uniform sampler2D uWireTex;
+    uniform vec2 uSunUV; uniform float uSunVis; uniform float uNight; uniform float uMono;
     out vec4 oOut;
     void main() {
       vec3 c = texture(uColorTex, vUV).rgb;
       float em = texture(uWireTex, vUV).b;
       vec3 bloom = c * pow(em, 1.15) * mix(0.72, 1.45, uNight);
-
       vec3 rays = vec3(0.0);
       if (uSunVis > 0.01) {
-        vec2 delta = (vUV - uSunUV) * (0.84 / 16.0);
-        vec2 uv = vUV;
+        vec2 delta = (vUV - uSunUV) * (0.84 / 16.0), uv = vUV;
         float decay = 1.0, acc = 0.0;
         for (int i = 0; i < 16; i++) {
-          uv -= delta;
-          if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) break;
-          float skyOpen = 1.0 - smoothstep(0.15, 0.75, texture(uColorTex, uv).a);
-          float sunProx = exp(-length((uv - uSunUV) * vec2(1.6, 1.0)) * 5.0);
-          acc += skyOpen * sunProx * decay;
+          uv -= delta; if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) break;
+          acc += (1.0 - smoothstep(0.15, 0.75, texture(uColorTex, uv).a)) * exp(-length((uv - uSunUV) * vec2(1.6, 1.0)) * 5.0) * decay;
           decay *= 0.93;
         }
         vec3 rayC = mix(vec3(1.0, 0.78, 0.46), vec3(0.52, 0.74, 0.98), uNight);
@@ -1026,13 +860,9 @@ const ShanHaiEngine = (() => {
       oOut = vec4(bloom + rays, 1.0);
     }
   `;
-
   const FS_BLUR = `#version 300 es
-    precision highp float;
-    in vec2 vUV;
-    uniform sampler2D uTex;
-    uniform vec2 uStep;
-    out vec4 oOut;
+    precision highp float; in vec2 vUV;
+    uniform sampler2D uTex; uniform vec2 uStep; out vec4 oOut;
     void main() {
       vec3 acc = texture(uTex, vUV).rgb * 0.227027;
       acc += (texture(uTex, vUV + uStep * 1.3846).rgb + texture(uTex, vUV - uStep * 1.3846).rgb) * 0.316216;
@@ -1040,23 +870,10 @@ const ShanHaiEngine = (() => {
       oOut = vec4(acc, 1.0);
     }
   `;
-
-  // ==========================================================================
-  // PASS 5: FINE-ART XUAN-PAPER CAPILLARY INK-BLEED + WATERCOLOR WET-EDGE +
-  //         ADAPTIVE KUWAHARA BRUSHWORK + GOLD-FLECKED PAPER (灑金宣紙)
-  // ==========================================================================
   const FS_FINAL = `#version 300 es
-    precision highp float;
-    in vec2 vUV;
-    uniform sampler2D uColorTex;
-    uniform sampler2D uDataTex;
-    uniform sampler2D uWireTex;
-    uniform sampler2D uBloomTex;
-    uniform vec2 uRes;
-    uniform float uTime;
-    uniform float uNight;
-    uniform float uMono;
-    uniform float uCurtain;
+    precision highp float; in vec2 vUV;
+    uniform sampler2D uColorTex; uniform sampler2D uDataTex; uniform sampler2D uWireTex; uniform sampler2D uBloomTex;
+    uniform vec2 uRes; uniform float uTime; uniform float uNight; uniform float uMono; uniform float uCurtain;
     ${GLSL_COMMON}
     out vec4 fragColor;
 
@@ -1069,114 +886,67 @@ const ShanHaiEngine = (() => {
       for (int y = 0; y <= 2; y++) for (int x = 0; x <= 2; x++) { vec3 c = texture(uColorTex, uv + vec2(float(x), float(y)) * px).rgb; m[3] += c; s[3] += c * c; }
       float minV = 1e9; vec3 best = m[0] / 9.0;
       for (int k = 0; k < 4; k++) {
-        vec3 mean = m[k] / 9.0;
-        vec3 v3 = abs(s[k] / 9.0 - mean * mean);
-        float v = v3.r + v3.g + v3.b;
+        vec3 mean = m[k] / 9.0; vec3 v3 = abs(s[k] / 9.0 - mean * mean); float v = v3.r + v3.g + v3.b;
         if (v < minV) { minV = v; best = mean; }
       }
       return best;
     }
-
-    vec3 acesFilm(vec3 x) {
-      return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
-    }
+    vec3 acesFilm(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
 
     void main() {
-      vec2 px = 1.0 / uRes;
-      vec4 wireD = texture(uWireTex, vUV);
-      vec4 rawData = texture(uDataTex, vUV);
-
-      // 1. SECRET WEAPON #1: Capillary Xuan-Paper Ink-Bleed UV Displacement!
-      //    Softly trembles razor-straight CG edges along organic handmade paper fibers!
-      vec2 pCoord = gl_FragCoord.xy;
-      vec2 paperGrad = vec2(
-        fbm2(pCoord * 0.042 + vec2(3.1, 1.7)) - 0.5,
-        fbm2(pCoord * 0.042 + vec2(17.9, 8.4)) - 0.5
-      );
+      vec2 px = 1.0 / uRes, pCoord = gl_FragCoord.xy;
+      vec4 wireD = texture(uWireTex, vUV), rawData = texture(uDataTex, vUV);
+      vec2 paperGrad = vec2(fbm2(pCoord * 0.042 + vec2(3.1, 1.7)) - 0.5, fbm2(pCoord * 0.042 + vec2(17.9, 8.4)) - 0.5);
       vec2 bleedUV = clamp(vUV + paperGrad * px * mix(2.2, 0.8, uNight), vec2(0.001), vec2(0.999));
 
-      vec4 rawC = texture(uColorTex, bleedUV);
-      vec4 data = texture(uDataTex, bleedUV);
+      vec4 rawC = texture(uColorTex, bleedUV), data = texture(uDataTex, bleedUV);
       vec3 bloom = texture(uBloomTex, vUV).rgb;
-      float linDepth = data.b;
-      float edgeCtrl = data.a;
+      float linDepth = data.b, edgeCtrl = data.a;
 
-      // 2. Adaptive Painterly Kuwahara Brushwork (NEVER smears glowing fireflies/lanterns into squares!)
-      float paintW = (rawC.a > 0.5)
-        ? mix(0.20, 0.64, smoothstep(0.90, 0.30, edgeCtrl)) * smoothstep(0.05, 0.25, edgeCtrl)
-        : 0.0;
-      paintW *= (1.0 - smoothstep(0.08, 0.36, wireD.b)); // Protects glowing fireflies, lanterns & Kun runes!
+      float paintW = (rawC.a > 0.5) ? mix(0.20, 0.64, smoothstep(0.90, 0.30, edgeCtrl)) * smoothstep(0.05, 0.25, edgeCtrl) : 0.0;
+      paintW *= (1.0 - smoothstep(0.08, 0.36, wireD.b));
       vec3 paintCol = (paintW > 0.01) ? mix(rawC.rgb, kuwahara(bleedUV, px * 1.20), paintW) : rawC.rgb;
 
-      // 3. SECRET WEAPON #2: True Watercolor Wet-Edge Pigment Pooling (水痕邊 — NEVER cheap black cartoon outlines!)
       if (rawC.a > 0.5 && edgeCtrl > 0.25 && linDepth < 0.62) {
-        vec4 dL = texture(uDataTex, bleedUV - vec2(px.x * 1.4, 0.0));
-        vec4 dR = texture(uDataTex, bleedUV + vec2(px.x * 1.4, 0.0));
-        vec4 dD = texture(uDataTex, bleedUV - vec2(0.0, px.y * 1.4));
-        vec4 dU = texture(uDataTex, bleedUV + vec2(0.0, px.y * 1.4));
-        float zJump = (abs(dR.b - dL.b) + abs(dU.b - dD.b)) * 18.0;
-        float nJump = length(dR.rg - dL.rg) + length(dU.rg - dD.rg);
-        float wetEdge = smoothstep(0.32, 0.92, zJump + nJump * 0.65) * smoothstep(0.62, 0.14, linDepth);
-        float fiberBreak = 0.50 + 0.50 * vnoise(pCoord * 0.22);
-        // Darken & deepen the EXISTING pigment organically like wet ink pooling at stroke boundary!
-        paintCol *= mix(vec3(1.0), vec3(0.58, 0.62, 0.66), wetEdge * fiberBreak * 0.58);
+        vec4 dL = texture(uDataTex, bleedUV - vec2(px.x * 1.4, 0.0)), dR = texture(uDataTex, bleedUV + vec2(px.x * 1.4, 0.0));
+        vec4 dD = texture(uDataTex, bleedUV - vec2(0.0, px.y * 1.4)), dU = texture(uDataTex, bleedUV + vec2(0.0, px.y * 1.4));
+        float wetEdge = smoothstep(0.32, 0.92, (abs(dR.b - dL.b) + abs(dU.b - dD.b)) * 18.0 + (length(dR.rg - dL.rg) + length(dU.rg - dD.rg)) * 0.65) * smoothstep(0.62, 0.14, linDepth);
+        paintCol *= mix(vec3(1.0), vec3(0.58, 0.62, 0.66), wetEdge * (0.50 + 0.50 * vnoise(pCoord * 0.22)) * 0.58);
       }
 
-      // 4. Add Volumetric Sun/Moon Rays & Warm Lantern Bloom
       paintCol += bloom * mix(0.72, 1.12, uNight);
 
-      // 5. SECRET WEAPON #3: Organic Gold-Flecked Antique Xuan Paper (灑金宣紙 — turns negative space into fine art!)
-      float pulp = fbm2(pCoord * 0.022);
-      float fiber = fbm2(vec2(pCoord.x * 0.18 + pulp * 2.0, pCoord.y * 0.045));
-      float paperTex = (pulp - 0.5) * 0.048 + (fiber - 0.5) * 0.032;
-      paintCol *= (1.0 + paperTex * mix(1.0, 0.35, uNight));
+      float pulp = fbm2(pCoord * 0.022), fiber = fbm2(vec2(pCoord.x * 0.18 + pulp * 2.0, pCoord.y * 0.045));
+      paintCol *= (1.0 + ((pulp - 0.5) * 0.048 + (fiber - 0.5) * 0.032) * mix(1.0, 0.35, uNight));
 
-      // Delicate Museum Gold-Leaf Flecks (灑金點點) glinting gently in the paper sky & mist!
       vec2 goldCell = floor(pCoord * 0.085);
-      float gRnd = hash12(goldCell);
-      if (gRnd > 0.992) {
-        vec2 gFrac = fract(pCoord * 0.085) - 0.5;
-        float gDot = smoothstep(0.32, 0.05, length(gFrac * vec2(1.0, 1.6)));
-        float paperArea = smoothstep(0.42, 0.85, dot(paintCol, vec3(0.33)));
-        paintCol = mix(paintCol, vec3(0.86, 0.68, 0.34), gDot * paperArea * mix(0.45, 0.25, uNight));
+      if (hash12(goldCell) > 0.992) {
+        float gDot = smoothstep(0.32, 0.05, length((fract(pCoord * 0.085) - 0.5) * vec2(1.0, 1.6)));
+        paintCol = mix(paintCol, vec3(0.86, 0.68, 0.34), gDot * smoothstep(0.42, 0.85, dot(paintCol, vec3(0.33))) * mix(0.45, 0.25, uNight));
       }
 
-      // Gentle museum scroll-edge warm burnish vignette
       vec2 vc = vUV * 2.0 - 1.0;
-      float vig = 1.0 - dot(vc * vec2(0.70, 0.84), vc * vec2(0.70, 0.84)) * 0.24;
-      paintCol *= (0.36 + 0.64 * clamp(vig, 0.0, 1.0));
-
-      // ACES Filmic Polish with crisp fine-art tonal range
+      paintCol *= (0.36 + 0.64 * clamp(1.0 - dot(vc * vec2(0.70, 0.84), vc * vec2(0.70, 0.84)) * 0.24, 0.0, 1.0));
       paintCol = acesFilm(paintCol * mix(1.10, 1.18, uNight));
       float luma = dot(paintCol, vec3(0.299, 0.587, 0.114));
-      float sat = mix(1.16, 1.08, uNight) * (1.0 - uMono * 0.05);
-      paintCol = clamp(mix(vec3(luma), paintCol, sat), 0.0, 1.0);
+      paintCol = clamp(mix(vec3(luma), paintCol, mix(1.16, 1.08, uNight) * (1.0 - uMono * 0.05)), 0.0, 1.0);
 
-      // 6. Right-Side 3D Technical X-Ray Inspector (Clay + Luminous Jade-Gold Wireframe)
       vec3 clayBg = (texture(uColorTex, vUV).a > 0.5)
         ? mix(vec3(0.05, 0.09, 0.13), vec3(0.20, 0.30, 0.36), wireD.r) * (1.0 - rawData.b * 0.55)
         : mix(vec3(0.03, 0.06, 0.10), vec3(0.07, 0.12, 0.18), vUV.y);
-      vec3 wireCol = mix(vec3(0.22, 0.88, 0.82), vec3(1.0, 0.72, 0.32), wireD.b);
-      vec3 techView = clayBg + wireCol * wireD.g * 0.88 + vec3(1.0, 0.62, 0.26) * wireD.b * 0.55;
+      vec3 techView = clayBg + mix(vec3(0.22, 0.88, 0.82), vec3(1.0, 0.72, 0.32), wireD.b) * wireD.g * 0.88 + vec3(1.0, 0.62, 0.26) * wireD.b * 0.55;
 
-      float side = smoothstep(uCurtain - 0.0025, uCurtain + 0.0025, vUV.x);
-      vec3 outCol = mix(paintCol, techView, side);
-      if (uCurtain > 0.005 && uCurtain < 0.995) {
-        float seam = exp(-abs(vUV.x - uCurtain) * uRes.x * 0.45);
-        outCol += vec3(0.92, 0.28, 0.18) * seam * 1.15;
-      }
-
+      vec3 outCol = mix(paintCol, techView, smoothstep(uCurtain - 0.0025, uCurtain + 0.0025, vUV.x));
+      if (uCurtain > 0.005 && uCurtain < 0.995) outCol += vec3(0.92, 0.28, 0.18) * exp(-abs(vUV.x - uCurtain) * uRes.x * 0.45) * 1.15;
       fragColor = vec4(outCol, 1.0);
     }
   `;
 
   /* ==========================================================================
-     4. WebGL2 Helpers
+     4. WebGL2 Helpers & Engine Setup
      ========================================================================== */
   function compileShader(gl, type, src) {
-    const sh = gl.createShader(type);
-    gl.shaderSource(sh, src);
-    gl.compileShader(sh);
+    const sh = gl.createShader(type); gl.shaderSource(sh, src); gl.compileShader(sh);
     if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh));
     return sh;
   }
@@ -1189,8 +959,7 @@ const ShanHaiEngine = (() => {
     return p;
   }
   function createTex2D(gl, w, h, iFmt, fmt, type, filter) {
-    const t = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, t);
+    const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
     gl.texImage2D(gl.TEXTURE_2D, 0, iFmt, w, h, 0, fmt, type, null);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
@@ -1200,23 +969,15 @@ const ShanHaiEngine = (() => {
   }
   function buildVAO(gl, floatData, layout) {
     const vao = gl.createVertexArray(), vbo = gl.createBuffer();
-    gl.bindVertexArray(vao);
-    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    gl.bindVertexArray(vao); gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
     gl.bufferData(gl.ARRAY_BUFFER, floatData, gl.STATIC_DRAW);
     const stride = layout.reduce((a, b) => a + b.size, 0) * 4;
     let off = 0;
-    layout.forEach((a) => {
-      gl.enableVertexAttribArray(a.loc);
-      gl.vertexAttribPointer(a.loc, a.size, gl.FLOAT, false, stride, off);
-      off += a.size * 4;
-    });
+    layout.forEach((a) => { gl.enableVertexAttribArray(a.loc); gl.vertexAttribPointer(a.loc, a.size, gl.FLOAT, false, stride, off); off += a.size * 4; });
     gl.bindVertexArray(null);
     return vao;
   }
 
-  /* ==========================================================================
-     5. Engine Initialization & First-Person 360° Render Loop
-     ========================================================================== */
   function create(canvas, callbacks = {}) {
     const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, powerPreference: "high-performance" });
     if (!gl) throw new Error("WebGL2 required.");
@@ -1228,7 +989,7 @@ const ShanHaiEngine = (() => {
     const progSolid     = createProgram(gl, VS_SOLID, FS_SOLID);
     const progWater     = createProgram(gl, VS_WATER, FS_WATER);
     const progFoliage   = createProgram(gl, VS_FOLIAGE, FS_FOLIAGE);
-    const progKun       = createProgram(gl, VS_KUN, FS_KUN);
+    const progSpirit    = createProgram(gl, VS_SPIRIT, FS_SPIRIT);
     const progWaterfall = createProgram(gl, VS_WATERFALL, FS_WATERFALL);
     const progCloud     = createProgram(gl, VS_CLOUD, FS_CLOUD);
     const progParticles = createProgram(gl, VS_PARTICLES, FS_PARTICLES);
@@ -1242,10 +1003,10 @@ const ShanHaiEngine = (() => {
     const uSol = getU(progSolid, ["uModel", "uView", "uProj", "uLightVP", "uShadowMap", "uCamPos", "uSunDir", "uTime", "uNight", "uMono", "uClipY"]);
     const uWat = getU(progWater, ["uView", "uProj", "uRefVP", "uReflectTex", "uCamPos", "uSunDir", "uBoatPos", "uTime", "uNight", "uMono"]);
     const uFol = getU(progFoliage, ["uView", "uProj", "uCamPos", "uSunDir", "uTime", "uNight", "uMono", "uClipY"]);
-    const uKun = getU(progKun, ["uModel", "uView", "uProj", "uCamPos", "uSunDir", "uTime", "uNight", "uMono", "uClipY"]);
+    const uSpr = getU(progSpirit, ["uModel", "uView", "uProj", "uCamPos", "uSunDir", "uTime", "uNight", "uMono", "uClipY"]);
     const uWf  = getU(progWaterfall, ["uView", "uProj", "uCamPos", "uSunDir", "uTime", "uNight", "uMono", "uClipY"]);
     const uCld = getU(progCloud, ["uView", "uProj", "uCamPos", "uSunDir", "uTime", "uNight", "uMono", "uClipY"]);
-    const uPrt = getU(progParticles, ["uView", "uProj", "uKunPos", "uKunFwd", "uTime", "uDPR", "uNight", "uMono"]);
+    const uPrt = getU(progParticles, ["uView", "uProj", "uKunPos", "uKunFwd", "uDrgPos", "uDrgFwd", "uCamPos", "uTime", "uDPR", "uNight", "uMono"]);
     const uRay = getU(progBloomRays, ["uColorTex", "uWireTex", "uSunUV", "uSunVis", "uNight", "uMono"]);
     const uBlr = getU(progBlur, ["uTex", "uStep"]);
     const uFin = getU(progFinal, ["uColorTex", "uDataTex", "uWireTex", "uBloomTex", "uRes", "uTime", "uNight", "uMono", "uCurtain"]);
@@ -1253,6 +1014,11 @@ const ShanHaiEngine = (() => {
     const solidLayout = [{ loc: 0, size: 3 }, { loc: 1, size: 3 }, { loc: 2, size: 3 }, { loc: 3, size: 3 }, { loc: 4, size: 4 }];
     const vaoSolid     = buildVAO(gl, world.solid.data, solidLayout);
     const vaoKun       = buildVAO(gl, world.kun.data, solidLayout);
+    const vaoDragon    = buildVAO(gl, world.dragon.data, solidLayout);
+    const vaoPhoenix   = buildVAO(gl, world.phoenix.data, solidLayout);
+    const vaoFox       = buildVAO(gl, world.fox.data, solidLayout);
+    const vaoStag      = buildVAO(gl, world.stag.data, solidLayout);
+    const vaoKoi       = buildVAO(gl, world.koi.data, solidLayout);
     const vaoBoatman   = buildVAO(gl, world.boatman.data, solidLayout);
     const vaoCrane     = buildVAO(gl, world.crane.data, solidLayout);
     const vaoWaterfall = buildVAO(gl, world.waterfall.data, solidLayout);
@@ -1262,7 +1028,6 @@ const ShanHaiEngine = (() => {
     const vaoParticles = buildVAO(gl, world.particles.data, [{ loc: 0, size: 3 }, { loc: 1, size: 3 }]);
     const vaoEmpty     = gl.createVertexArray();
 
-    // Shadow FBO
     const SHADOW_RES = 1024;
     const fboShadow = gl.createFramebuffer();
     const texShadow = createTex2D(gl, SHADOW_RES, SHADOW_RES, gl.DEPTH_COMPONENT24, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, gl.NEAREST);
@@ -1279,23 +1044,16 @@ const ShanHaiEngine = (() => {
       [rbRefDepth, rbMainDepth].forEach((r) => r && gl.deleteRenderbuffer(r));
 
       refW = Math.max(256, w >> 1); refH = Math.max(144, h >> 1);
-      fboRef = gl.createFramebuffer();
-      texRef = createTex2D(gl, refW, refH, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
-      rbRefDepth = gl.createRenderbuffer();
-      gl.bindRenderbuffer(gl.RENDERBUFFER, rbRefDepth);
-      gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, refW, refH);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fboRef);
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texRef, 0);
-      gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, rbRefDepth);
-      gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
+      fboRef = gl.createFramebuffer(); texRef = createTex2D(gl, refW, refH, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
+      rbRefDepth = gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER, rbRefDepth); gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, refW, refH);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fboRef); gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texRef, 0);
+      gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, rbRefDepth); gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
 
       fboMain = gl.createFramebuffer();
       texColor = createTex2D(gl, w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
       texData  = createTex2D(gl, w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.NEAREST);
       texWire  = createTex2D(gl, w, h, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, gl.LINEAR);
-      rbMainDepth = gl.createRenderbuffer();
-      gl.bindRenderbuffer(gl.RENDERBUFFER, rbMainDepth);
-      gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, w, h);
+      rbMainDepth = gl.createRenderbuffer(); gl.bindRenderbuffer(gl.RENDERBUFFER, rbMainDepth); gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, w, h);
       gl.bindFramebuffer(gl.FRAMEBUFFER, fboMain);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texColor, 0);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, texData, 0);
@@ -1318,29 +1076,21 @@ const ShanHaiEngine = (() => {
       if (w !== curW || h !== curH) { curW = w; curH = h; canvas.width = w; canvas.height = h; allocFBOs(w, h); }
     }
 
-    // ---- Unobstructed First-Person Camera (Wide Open Infinite Mirror Sea!) ----
+    /* ========================================================================
+       5. Open-World Camera, Realm Discovery & All 7 Creature Choreography
+       ======================================================================== */
     const SPAWN_POS = [0.0, 4.6, 22.0];
-    const SPAWN_YAW = 0.0;
-    const SPAWN_PITCH = 0.095;
+    const SPAWN_YAW = 0.0, SPAWN_PITCH = 0.095;
 
     const state = {
       entered: false,
-      mode: "free",
-      style: "bluegreen", // "bluegreen" (潑彩青綠) | "mono" (墨韻丹砂) | "night" (幽冥青燈)
-      nightVal: 0.0,
-      monoVal: 0.0,
-      curtain: 1.0,
-      targetCurtain: 1.0,
-      pos: SPAWN_POS.slice(),
-      vel: [0, 0, 0],
-      yaw: SPAWN_YAW,
-      pitch: SPAWN_PITCH,
-      targetYaw: SPAWN_YAW,
-      targetPitch: SPAWN_PITCH,
-      lookOffsetYaw: 0.0,
-      lookOffsetPitch: 0.0,
-      cruiseT: 0.0,
-      keys: {}
+      mode: "free", // "free" | "cruise" | "soar" | "dragon" | "qingqiu" | "phoenix"
+      style: "bluegreen",
+      nightVal: 0.0, monoVal: 0.0, curtain: 1.0, targetCurtain: 1.0,
+      pos: SPAWN_POS.slice(), vel: [0, 0, 0],
+      yaw: SPAWN_YAW, pitch: SPAWN_PITCH, targetYaw: SPAWN_YAW, targetPitch: SPAWN_PITCH,
+      lookOffsetYaw: 0.0, lookOffsetPitch: 0.0,
+      cruiseT: 0.0, lastRegion: "", keys: {}
     };
 
     const qp = new URLSearchParams(location.search);
@@ -1354,9 +1104,20 @@ const ShanHaiEngine = (() => {
     if (qp.get("curtain") !== null) state.curtain = state.targetCurtain = Math.max(0, Math.min(1, Number(qp.get("curtain"))));
     if (qp.get("yaw") !== null) state.yaw = state.targetYaw = SPAWN_YAW + (Number(qp.get("yaw")) * Math.PI) / 180;
     if (qp.get("pitch") !== null) state.pitch = state.targetPitch = (Number(qp.get("pitch")) * Math.PI) / 180;
+    if (qp.get("pos")) {
+      const p = qp.get("pos").split(",").map(Number);
+      if (p.length === 3 && p.every(Number.isFinite)) state.pos = p;
+    }
 
-    function notifyEnter() {
-      if (!state.entered) { state.entered = true; if (callbacks.onEnter) callbacks.onEnter(); }
+    function notifyEnter() { if (!state.entered) { state.entered = true; if (callbacks.onEnter) callbacks.onEnter(); } }
+
+    function detectRegion(p) {
+      if (p[2] < -128) return { id: "buzhou", zh: "不周天門・應龍盤雲", en: "MOUNT BUZHOU · YINGLONG DRAGON" };
+      if (p[0] < -58)  return { id: "qingqiu", zh: "青丘丹楓・九尾靈狐", en: "QINGQIU ISLES · NINE-TAILED FOXES" };
+      if (p[0] >  58)  return { id: "danshan", zh: "丹山朝陽・朱鳳鳴天", en: "DANSHAN PEAKS · VERMILION PHOENIX" };
+      if (p[2] < -42)  return { id: "penglai", zh: "蓬萊雲海・北冥雙鯤", en: "PENGLAI GORGE · TWIN SPIRIT KUNS" };
+      if (p[2] >  36)  return { id: "nanming", zh: "南冥歸舟・月下孤亭", en: "SOUTHERN MIST · MOON PAVILION" };
+      return { id: "bianhe", zh: "汴水虹橋・孤舟簑笠", en: "BIANHE ARCH · LONE BOATMAN" };
     }
 
     let dragging = false, lastX = 0, lastY = 0;
@@ -1379,16 +1140,15 @@ const ShanHaiEngine = (() => {
     canvas.addEventListener("pointercancel", () => { dragging = false; });
 
     canvas.addEventListener("wheel", (e) => {
-      e.preventDefault();
-      notifyEnter();
+      e.preventDefault(); notifyEnter();
       if (state.mode !== "free") {
         state.mode = "free"; state.targetYaw = state.yaw; state.targetPitch = state.pitch;
         state.lookOffsetYaw = 0; state.lookOffsetPitch = 0;
         if (callbacks.onModeChange) callbacks.onModeChange("free");
       }
-      const step = -Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY) * 0.045, 4.5);
+      const step = -Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY) * 0.055, 6.5);
       const fwd = [-Math.sin(state.yaw) * Math.cos(state.pitch), Math.sin(state.pitch), -Math.cos(state.yaw) * Math.cos(state.pitch)];
-      state.vel[0] += fwd[0] * step * 2.6; state.vel[1] += fwd[1] * step * 2.2; state.vel[2] += fwd[2] * step * 2.6;
+      state.vel[0] += fwd[0] * step * 3.2; state.vel[1] += fwd[1] * step * 2.4; state.vel[2] += fwd[2] * step * 3.2;
     }, { passive: false });
 
     window.addEventListener("keydown", (e) => {
@@ -1406,8 +1166,9 @@ const ShanHaiEngine = (() => {
     window.addEventListener("keyup", (e) => { state.keys[e.key.toLowerCase()] = false; });
 
     function clampSafeFPSPos(p) {
-      p[0] = Math.max(-72, Math.min(72, p[0]));
-      p[2] = Math.max(-96, Math.min(58, p[2]));
+      // Vast 380m x 400m explorable scroll bounds!
+      p[0] = Math.max(-185, Math.min(185, p[0]));
+      p[2] = Math.max(-265, Math.min(115, p[2]));
       const terr = ShanHaiGeometry.terrainHeight(p[0], p[2]);
       let minY = Math.max(1.75, terr + 2.4);
       if (Math.abs(p[2] - ShanHaiGeometry.BRIDGE_Z) < 3.4) {
@@ -1416,7 +1177,7 @@ const ShanHaiEngine = (() => {
           p[1] = (p[1] < deckY - 0.1 && deckY > 4.5) ? deckY - 1.5 : deckY + 2.0;
         }
       }
-      p[1] = Math.max(minY, Math.min(48.0, p[1]));
+      p[1] = Math.max(minY, Math.min(82.0, p[1]));
     }
 
     let elapsed = qp.get("t") !== null ? Number(qp.get("t")) : 3.2;
@@ -1424,48 +1185,112 @@ const ShanHaiEngine = (() => {
     const identity = mat4Identity();
 
     const SUN_DIR = (() => {
-      // Positioned cleanly in the luminous valley gap right above the Rainbow Bridge & between the twin spires!
       const v = [0.065, 0.305, -0.950], l = Math.hypot(v[0], v[1], v[2]);
       return [v[0] / l, v[1] / l, v[2] / l];
     })();
 
-    const lightView = mat4LookAt([SUN_DIR[0] * 75, SUN_DIR[1] * 75, -24 + SUN_DIR[2] * 75], [0, 4, -24], [0, 1, 0]);
-    const lightProj = mat4Ortho(-56, 56, -42, 46, 8, 165);
+    const lightView = mat4LookAt([SUN_DIR[0] * 110, SUN_DIR[1] * 110, -45 + SUN_DIR[2] * 110], [0, 6, -45], [0, 1, 0]);
+    const lightProj = mat4Ortho(-95, 95, -75, 85, 10, 260);
     const lightVP = mat4Mul(lightProj, lightView);
 
-    const cranes = Array.from({ length: 7 }, (_, i) => ({
-      r: 16 + (i % 3) * 8.5, h: 15.0 + (i % 4) * 3.8, sp: 0.20 + (i % 3) * 0.04, ph: i * 0.92, cz: -24 - (i % 3) * 16
+    // ---- Static Poised Creatures (2 Nine-Tailed Spirit Foxes + 2 Golden-Antlered Spirit Stags) ----
+    const foxInstances = [
+      { x: -94.2, z: -76.2, rotY:  0.22, sc: 0.96 }, // Facing gracefully toward viewer with 9 silk tails blooming behind like a halo!
+      { x: -113.0, z: -54.0, rotY: 0.45, sc: 0.92 }  // Companion Nine-Tailed Fox on Southern Maple Crag!
+    ].map((f) => ({
+      mat: mat4ModelTRS(f.x, ShanHaiGeometry.terrainHeight(f.x, f.z) - 0.10, f.z, 0, f.rotY, 0, f.sc, f.sc, f.sc)
     }));
 
-    function computeKunState(t) {
-      const ang = t * 0.085 + 0.48;
-      const x = Math.sin(ang) * 35.0, z = -54.0 + Math.cos(ang) * 18.0, y = 25.0 + Math.sin(ang * 2.0) * 3.2;
+    const stagInstances = [
+      { x: -102.5, z: -76.5, rotY:  0.55, sc: 1.12 }, // White Spirit Stag among Qingqiu Maples!
+      { x:  113.5, z: -48.5, rotY: -0.95, sc: 1.18 }  // Eastern Sun-Spire Spirit Stag!
+    ].map((s) => ({
+      mat: mat4ModelTRS(s.x, ShanHaiGeometry.terrainHeight(s.x, s.z) - 0.1, s.z, 0, s.rotY, 0, s.sc, s.sc, s.sc)
+    }));
+
+    // ---- 18 Ink Cranes in Two Thermal Flocks across the 400m World ----
+    const cranes = Array.from({ length: 18 }, (_, i) => ({
+      cx: (i < 8 ? 0 : (i < 13 ? -92 : 98)),
+      cz: (i < 8 ? -24 - (i % 3) * 20 : (i < 13 ? -82 : -105)),
+      r: 16 + (i % 4) * 9.0,
+      h: 15.0 + (i % 5) * 4.2,
+      sp: 0.19 + (i % 3) * 0.04,
+      ph: i * 0.68
+    }));
+
+    // ---- 28 Leaping Vermilion-Gold Spirit Koi / Wenyao Schools! ----
+    const koiList = Array.from({ length: 28 }, (_, i) => {
+      // 14 swimming & leaping near Bianhe Bridge & Boatman; 7 near Qingqiu Paifang; 7 near Buzhou Arch!
+      const grp = i < 14 ? 0 : (i < 21 ? 1 : 2);
+      const bx = grp === 0 ? (i % 2 === 0 ? -4.5 : 4.5) : (grp === 1 ? -82.0 : 0.0);
+      const bz = grp === 0 ? -8.0 - (i % 7) * 5.2 : (grp === 1 ? -76.0 : -168.0);
+      return { cx: bx, cz: bz, r: 5.5 + (i % 5) * 2.4, sp: 0.42 + (i % 4) * 0.12, ph: i * 0.85, sc: 0.55 + (i % 3) * 0.18 };
+    });
+
+    // ---- 3 Vermilion Phoenixes (丹山朱鳳) ----
+    const phoenixSpecs = [
+      { cx: 108.0, cz: -102.0, rx: 32.0, rz: 24.0, baseY: 32.0, sp: 0.16, ph: 0.4, sc: 1.05 }, // Eastern Sun Spire Lead Phoenix
+      { cx: 108.0, cz: -102.0, rx: 25.0, rz: 19.0, baseY: 26.0, sp: 0.18, ph: 2.6, sc: 0.85 }, // Eastern Companion Phoenix
+      { cx: -28.0, cz:  -96.0, rx: 46.0, rz: 28.0, baseY: 34.0, sp: 0.14, ph: 1.1, sc: 0.92 }  // Central Gorge Soaring Phoenix!
+    ];
+
+    function computeKunState(t, phaseOff = 0, scale = 0.78, yOff = 0, rScale = 1.0) {
+      const ang = t * 0.085 + 0.48 + phaseOff;
+      const x = Math.sin(ang) * 35.0 * rScale, z = -54.0 + Math.cos(ang) * 18.0 * rScale, y = 25.0 + yOff + Math.sin(ang * 2.0) * 3.2;
       const na = ang + 0.03;
-      const nx = Math.sin(na) * 35.0, nz = -54.0 + Math.cos(na) * 18.0, ny = 25.0 + Math.sin(na * 2.0) * 3.2;
+      const nx = Math.sin(na) * 35.0 * rScale, nz = -54.0 + Math.cos(na) * 18.0 * rScale, ny = 25.0 + yOff + Math.sin(na * 2.0) * 3.2;
       const dx = nx - x, dy = ny - y, dz = nz - z, dl = Math.hypot(dx, dy, dz) || 1;
       return {
-        pos: [x, y, z],
-        fwd: [dx / dl, dy / dl, dz / dl],
-        mat: mat4ModelTRS(x, y, z, -Math.atan2(dy, Math.hypot(dx, dz)), Math.atan2(dx, dz), -Math.cos(ang) * 0.22, 0.78, 0.78, 0.78)
+        pos: [x, y, z], fwd: [dx / dl, dy / dl, dz / dl],
+        mat: mat4ModelTRS(x, y, z, -Math.atan2(dy, Math.hypot(dx, dz)), Math.atan2(dx, dz), -Math.cos(ang) * 0.22, scale, scale, scale)
       };
     }
 
-    function computeBoatmanState(t) {
-      // Glides peacefully in poetic slow motion toward the Rainbow Bridge arch!
-      const bz = -3.0 - ((t * 0.65) % 42.0);
-      const bx = ShanHaiGeometry.riverCenterX(bz) - 1.6;
-      const nz = bz - 2.0, nx = ShanHaiGeometry.riverCenterX(nz) - 1.6;
-      const yaw = Math.atan2(nx - bx, nz - bz);
-      const bob = Math.sin(t * 1.8) * 0.028;
+    // Grand Figure-8 / Helical Flight Path Weaving RIGHT THROUGH the 75m Mount Buzhou Celestial Gate (z = -179)!
+    function computeDragonState(t) {
+      const a = t * 0.13 - 0.35;
+      const x = Math.sin(a) * 32.0;
+      const z = -182.0 + Math.sin(a * 2.0) * 24.0;
+      const y = 36.0 + Math.cos(a) * 9.5;
+      const na = a + 0.025;
+      const nx = Math.sin(na) * 32.0, nz = -182.0 + Math.sin(na * 2.0) * 24.0, ny = 36.0 + Math.cos(na) * 9.5;
+      const dx = nx - x, dy = ny - y, dz = nz - z, dl = Math.hypot(dx, dy, dz) || 1;
       return {
-        pos: [bx, 0.02 + bob, bz],
-        mat: mat4ModelTRS(bx, 0.02 + bob, bz, bob, yaw, bob * 0.6, 1.0, 1.0, 1.0)
+        pos: [x, y, z], fwd: [dx / dl, dy / dl, dz / dl],
+        mat: mat4ModelTRS(x, y, z, -Math.atan2(dy, Math.hypot(dx, dz)), Math.atan2(dx, dz), Math.cos(a) * 0.25, 0.90, 0.90, 0.90)
       };
+    }
+
+    function computePhoenixState(sp, t) {
+      const a = t * sp.sp + sp.ph;
+      const x = sp.cx + Math.sin(a) * sp.rx, z = sp.cz + Math.cos(a) * sp.rz, y = sp.baseY + Math.sin(a * 2.0) * 4.2;
+      const na = a + 0.03;
+      const nx = sp.cx + Math.sin(na) * sp.rx, nz = sp.cz + Math.cos(na) * sp.rz, ny = sp.baseY + Math.sin(na * 2.0) * 4.2;
+      const dx = nx - x, dy = ny - y, dz = nz - z;
+      return { pos: [x, y, z], mat: mat4ModelTRS(x, y, z, -Math.atan2(dy, Math.hypot(dx, dz)), Math.atan2(dx, dz), -Math.cos(a) * 0.25, sp.sc, sp.sc, sp.sc) };
+    }
+
+    function computeBoatStates(t) {
+      // Boat 0 = Iconic Opening Lone Boatman; Boats 1..3 = Farther Lantern Sampans across the vast mirror sea!
+      const specs = [
+        { z0: -3.0,   off: -1.6, sp: 0.65, loop: 42.0, cxFn: (z) => ShanHaiGeometry.riverCenterX(z) },
+        { z0: -88.0,  off:  4.5, sp: 0.85, loop: 55.0, cxFn: (z) => ShanHaiGeometry.riverCenterX(z) },
+        { z0: -76.0,  off:  0.0, sp: 0.55, loop: 28.0, cxFn: () => -74.0 }, // Qingqiu Lantern Skiff!
+        { z0: -162.0, off:  5.0, sp: 0.72, loop: 50.0, cxFn: () =>  0.0  }  // Mount Buzhou Pilgrim Boat!
+      ];
+      return specs.map((b, i) => {
+        const bz = b.z0 - ((t * b.sp) % b.loop);
+        const bx = b.cxFn(bz) + b.off;
+        const nz = bz - 2.0, nx = b.cxFn(nz) + b.off;
+        const yaw = Math.atan2(nx - bx, nz - bz);
+        const bob = Math.sin(t * 1.8 + i) * 0.028;
+        return { pos: [bx, 0.02 + bob, bz], mat: mat4ModelTRS(bx, 0.02 + bob, bz, bob, yaw, bob * 0.6, 1, 1, 1) };
+      });
     }
 
     let refVPGlobal = identity, shadowBaked = false;
 
-    function drawSceneContent(view, proj, camPos, kun, boatman, clipY, isRefPass) {
+    function drawSceneContent(view, proj, camPos, kun1, kun2, dragon, phoenixes, boats, clipY, isRefPass) {
       const invVP = invertMat4(mat4Mul(proj, view));
 
       // 1. Sky
@@ -1476,7 +1301,7 @@ const ShanHaiEngine = (() => {
       gl.uniform1f(uSky.uTime, elapsed); gl.uniform1f(uSky.uNight, state.nightVal); gl.uniform1f(uSky.uMono, state.monoVal);
       gl.bindVertexArray(vaoEmpty); gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-      // 2. Karst Peaks + Moon Bridge + Cliff Pavilion + Pagoda + Lone Boatman + Cranes
+      // 2. Opaque World + Boats + Spirit Stags + 28 Leaping Koi + 18 Ink Cranes
       gl.enable(gl.DEPTH_TEST); gl.depthMask(true);
       gl.useProgram(progSolid);
       gl.uniformMatrix4fv(uSol.uView, false, view); gl.uniformMatrix4fv(uSol.uProj, false, proj);
@@ -1489,18 +1314,39 @@ const ShanHaiEngine = (() => {
       gl.uniformMatrix4fv(uSol.uModel, false, identity);
       gl.bindVertexArray(vaoSolid); gl.drawArrays(gl.TRIANGLES, 0, world.solid.count);
 
-      gl.uniformMatrix4fv(uSol.uModel, false, boatman.mat);
-      gl.bindVertexArray(vaoBoatman); gl.drawArrays(gl.TRIANGLES, 0, world.boatman.count);
+      // 4 Lantern Boats
+      gl.bindVertexArray(vaoBoatman);
+      boats.forEach((b) => { gl.uniformMatrix4fv(uSol.uModel, false, b.mat); gl.drawArrays(gl.TRIANGLES, 0, world.boatman.count); });
 
-      cranes.forEach((cr) => {
-        const a = elapsed * cr.sp + cr.ph;
-        const cx = Math.sin(a) * cr.r, cz = cr.cz + Math.cos(a) * cr.r * 0.72, cy = cr.h + Math.sin(a * 2.0) * 1.4;
-        const cyaw = Math.atan2(Math.cos(a) * cr.r, -Math.sin(a) * cr.r * 0.72);
-        gl.uniformMatrix4fv(uSol.uModel, false, mat4ModelTRS(cx, cy, cz, 0, cyaw, -0.15, 0.78, 0.78, 0.78));
-        gl.bindVertexArray(vaoCrane); gl.drawArrays(gl.TRIANGLES, 0, world.crane.count);
+      // 2 Golden-Antlered White Spirit Stags
+      gl.bindVertexArray(vaoStag);
+      stagInstances.forEach((s) => { gl.uniformMatrix4fv(uSol.uModel, false, s.mat); gl.drawArrays(gl.TRIANGLES, 0, world.stag.count); });
+
+      // 28 Leaping Vermilion-Gold Spirit Koi / Wenyao Fish!
+      gl.bindVertexArray(vaoKoi);
+      koiList.forEach((k) => {
+        const a = elapsed * k.sp + k.ph;
+        const kx = k.cx + Math.sin(a) * k.r, kz = k.cz + Math.cos(a) * k.r * 0.78;
+        const arc = Math.sin(elapsed * 2.2 + k.ph * 2.0);
+        // Periodic graceful leaps right out of the mirror water!
+        const ky = arc > 0.35 ? (arc - 0.35) * 2.6 : -0.18 + arc * 0.12;
+        const pitch = arc > 0.35 ? -Math.cos(elapsed * 2.2 + k.ph * 2.0) * 0.65 : 0.0;
+        const yaw = Math.atan2(Math.cos(a) * k.r, -Math.sin(a) * k.r * 0.78);
+        gl.uniformMatrix4fv(uSol.uModel, false, mat4ModelTRS(kx, ky, kz, pitch, yaw, 0, k.sc, k.sc, k.sc));
+        gl.drawArrays(gl.TRIANGLES, 0, world.koi.count);
       });
 
-      // 3. Calligraphic Silhouette Pines & Cinnabar Maples
+      // 18 Soaring Ink Cranes
+      gl.bindVertexArray(vaoCrane);
+      cranes.forEach((cr) => {
+        const a = elapsed * cr.sp + cr.ph;
+        const cx = cr.cx + Math.sin(a) * cr.r, cz = cr.cz + Math.cos(a) * cr.r * 0.72, cy = cr.h + Math.sin(a * 2.0) * 1.4;
+        const cyaw = Math.atan2(Math.cos(a) * cr.r, -Math.sin(a) * cr.r * 0.72);
+        gl.uniformMatrix4fv(uSol.uModel, false, mat4ModelTRS(cx, cy, cz, 0, cyaw, -0.15, 0.78, 0.78, 0.78));
+        gl.drawArrays(gl.TRIANGLES, 0, world.crane.count);
+      });
+
+      // 3. Calligraphic Pines & Cinnabar Maples
       gl.useProgram(progFoliage);
       gl.uniformMatrix4fv(uFol.uView, false, view); gl.uniformMatrix4fv(uFol.uProj, false, proj);
       gl.uniform3fv(uFol.uCamPos, camPos); gl.uniform3fv(uFol.uSunDir, SUN_DIR);
@@ -1508,19 +1354,19 @@ const ShanHaiEngine = (() => {
       gl.uniform1f(uFol.uClipY, clipY);
       gl.bindVertexArray(vaoFoliage); gl.drawArrays(gl.TRIANGLES, 0, world.foliage.count);
 
-      // 4. Infinite Mirror Xuan-Paper Ink Sea
+      // 4. Infinite Mirror Xuan-Paper Water
       if (!isRefPass) {
         gl.useProgram(progWater);
         gl.uniformMatrix4fv(uWat.uView, false, view); gl.uniformMatrix4fv(uWat.uProj, false, proj);
         gl.uniformMatrix4fv(uWat.uRefVP, false, refVPGlobal);
         gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texRef); gl.uniform1i(uWat.uReflectTex, 0);
         gl.uniform3fv(uWat.uCamPos, camPos); gl.uniform3fv(uWat.uSunDir, SUN_DIR);
-        gl.uniform3fv(uWat.uBoatPos, boatman.pos);
+        gl.uniform3fv(uWat.uBoatPos, boats[0].pos);
         gl.uniform1f(uWat.uTime, elapsed); gl.uniform1f(uWat.uNight, state.nightVal); gl.uniform1f(uWat.uMono, state.monoVal);
         gl.bindVertexArray(vaoWater); gl.drawArrays(gl.TRIANGLES, 0, world.water.count);
       }
 
-      // 5. Translucent Ethereal Layer: Waterfalls + Mist Sea + Splash-Ink Kun + 3D Crimson Petals
+      // 5. Translucent Ethereal Layer: 6 Waterfalls + Mist Sea + ALL Mythic Spirit Creatures + 1,650 Particles!
       gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
 
       gl.useProgram(progWaterfall);
@@ -1537,18 +1383,32 @@ const ShanHaiEngine = (() => {
       gl.uniform1f(uCld.uClipY, clipY);
       gl.bindVertexArray(vaoClouds); gl.drawArrays(gl.TRIANGLES, 0, world.clouds.count);
 
-      gl.useProgram(progKun);
-      gl.uniformMatrix4fv(uKun.uModel, false, kun.mat);
-      gl.uniformMatrix4fv(uKun.uView, false, view); gl.uniformMatrix4fv(uKun.uProj, false, proj);
-      gl.uniform3fv(uKun.uCamPos, camPos); gl.uniform3fv(uKun.uSunDir, SUN_DIR);
-      gl.uniform1f(uKun.uTime, elapsed); gl.uniform1f(uKun.uNight, state.nightVal); gl.uniform1f(uKun.uMono, state.monoVal);
-      gl.uniform1f(uKun.uClipY, clipY);
-      gl.bindVertexArray(vaoKun); gl.drawArrays(gl.TRIANGLES, 0, world.kun.count);
+      // All Ethereal Mythic Creatures (Twin Kuns + 70m Winged Dragon + 3 Vermilion Phoenixes + 2 Nine-Tailed Foxes!)
+      gl.useProgram(progSpirit);
+      gl.uniformMatrix4fv(uSpr.uView, false, view); gl.uniformMatrix4fv(uSpr.uProj, false, proj);
+      gl.uniform3fv(uSpr.uCamPos, camPos); gl.uniform3fv(uSpr.uSunDir, SUN_DIR);
+      gl.uniform1f(uSpr.uTime, elapsed); gl.uniform1f(uSpr.uNight, state.nightVal); gl.uniform1f(uSpr.uMono, state.monoVal);
+      gl.uniform1f(uSpr.uClipY, clipY);
+
+      gl.bindVertexArray(vaoKun);
+      gl.uniformMatrix4fv(uSpr.uModel, false, kun1.mat); gl.drawArrays(gl.TRIANGLES, 0, world.kun.count);
+      gl.uniformMatrix4fv(uSpr.uModel, false, kun2.mat); gl.drawArrays(gl.TRIANGLES, 0, world.kun.count);
+
+      gl.bindVertexArray(vaoDragon);
+      gl.uniformMatrix4fv(uSpr.uModel, false, dragon.mat); gl.drawArrays(gl.TRIANGLES, 0, world.dragon.count);
+
+      gl.bindVertexArray(vaoPhoenix);
+      phoenixes.forEach((ph) => { gl.uniformMatrix4fv(uSpr.uModel, false, ph.mat); gl.drawArrays(gl.TRIANGLES, 0, world.phoenix.count); });
+
+      gl.bindVertexArray(vaoFox);
+      foxInstances.forEach((fx) => { gl.uniformMatrix4fv(uSpr.uModel, false, fx.mat); gl.drawArrays(gl.TRIANGLES, 0, world.fox.count); });
 
       if (!isRefPass) {
         gl.useProgram(progParticles);
         gl.uniformMatrix4fv(uPrt.uView, false, view); gl.uniformMatrix4fv(uPrt.uProj, false, proj);
-        gl.uniform3fv(uPrt.uKunPos, kun.pos); gl.uniform3fv(uPrt.uKunFwd, kun.fwd);
+        gl.uniform3fv(uPrt.uKunPos, kun1.pos); gl.uniform3fv(uPrt.uKunFwd, kun1.fwd);
+        gl.uniform3fv(uPrt.uDrgPos, dragon.pos); gl.uniform3fv(uPrt.uDrgFwd, dragon.fwd);
+        gl.uniform3fv(uPrt.uCamPos, camPos);
         gl.uniform1f(uPrt.uTime, elapsed); gl.uniform1f(uPrt.uDPR, Math.min(window.devicePixelRatio || 1, 1.5));
         gl.uniform1f(uPrt.uNight, state.nightVal); gl.uniform1f(uPrt.uMono, state.monoVal);
         gl.bindVertexArray(vaoParticles); gl.drawArrays(gl.POINTS, 0, world.particles.count);
@@ -1561,8 +1421,7 @@ const ShanHaiEngine = (() => {
       requestAnimationFrame(frame);
       if (document.hidden) { prevTs = now; return; }
       const dt = Math.min(0.05, (now - prevTs) / 1000);
-      prevTs = now;
-      elapsed += dt;
+      prevTs = now; elapsed += dt;
 
       frameCount++;
       if (now - fpsTs >= 500) {
@@ -1576,44 +1435,72 @@ const ShanHaiEngine = (() => {
       state.monoVal  += ((state.style === "mono"  ? 1 : 0) - state.monoVal)  * Math.min(1, dt * 3.5);
       state.curtain  += (state.targetCurtain - state.curtain) * Math.min(1, dt * 7.5);
 
-      const kun = computeKunState(elapsed);
-      const boatman = computeBoatmanState(elapsed);
+      const kun1 = computeKunState(elapsed, 0.0, 0.78, 0.0, 1.0);
+      const kun2 = computeKunState(elapsed, -0.58, 0.44, -5.5, 0.82); // Graceful Companion Calf Kun!
+      const dragon = computeDragonState(elapsed);
+      const phoenixes = phoenixSpecs.map((sp) => computePhoenixState(sp, elapsed));
+      const boats = computeBoatStates(elapsed);
 
-      // Update First-Person Camera
+      // Update Camera across Free Fly + 4 Guided Mythic Realm Tours!
       let camPos, camYaw, camPitch, fovy = 48 * Math.PI / 180;
+
       if (state.mode === "cruise") {
         state.cruiseT += dt;
-        const loopZ = 18.0 - ((state.cruiseT * 3.2 + (qp.get("t") ? Number(qp.get("t")) * 2.5 : 8.5)) % 78.0);
-        const cx = ShanHaiGeometry.riverCenterX(loopZ) + 0.4;
+        const loopZ = 18.0 - ((state.cruiseT * 3.5 + (qp.get("t") ? Number(qp.get("t")) * 2.5 : 8.5)) % 95.0);
+        const cx = ShanHaiGeometry.riverCenterX(loopZ) + 0.5;
         const aheadX = ShanHaiGeometry.riverCenterX(loopZ - 14.0);
         camPos = [cx, 2.55 + Math.sin(elapsed * 1.8) * 0.08, loopZ];
         camYaw = Math.atan2(-(aheadX - cx), 14.0) + state.lookOffsetYaw;
         camPitch = Math.max(-0.55, Math.min(0.95, 0.09 + Math.sin(elapsed * 0.4) * 0.03 + state.lookOffsetPitch));
-        state.pos = camPos.slice(); state.yaw = camYaw; state.pitch = camPitch;
-        fovy = 52 * Math.PI / 180;
+        state.pos = camPos.slice(); state.yaw = camYaw; state.pitch = camPitch; fovy = 52 * Math.PI / 180;
       } else if (state.mode === "soar") {
-        const backX = -kun.fwd[0] * 28.0 - kun.fwd[2] * 13.0;
-        const backZ = -kun.fwd[2] * 28.0 + kun.fwd[0] * 13.0;
-        camPos = [kun.pos[0] + backX, Math.max(13.5, kun.pos[1] + 2.8), kun.pos[2] + backZ];
-        const dx = kun.pos[0] - camPos[0], dy = kun.pos[1] - 1.2 - camPos[1], dz = kun.pos[2] - camPos[2];
+        const backX = -kun1.fwd[0] * 30.0 - kun1.fwd[2] * 14.0, backZ = -kun1.fwd[2] * 30.0 + kun1.fwd[0] * 14.0;
+        camPos = [kun1.pos[0] + backX, Math.max(13.5, kun1.pos[1] + 2.8), kun1.pos[2] + backZ];
+        const dx = kun1.pos[0] - camPos[0], dy = kun1.pos[1] - 1.5 - camPos[1], dz = kun1.pos[2] - camPos[2];
         camYaw = Math.atan2(-dx, -dz) + state.lookOffsetYaw;
         camPitch = Math.max(-0.62, Math.min(0.92, Math.atan2(dy, Math.hypot(dx, dz)) + state.lookOffsetPitch));
-        state.pos = camPos.slice(); state.yaw = camYaw; state.pitch = camPitch;
-        fovy = 50 * Math.PI / 180;
+        state.pos = camPos.slice(); state.yaw = camYaw; state.pitch = camPitch; fovy = 50 * Math.PI / 180;
+      } else if (state.mode === "dragon") {
+        // Unobstructed panoramic viewpoint PAST the Sky-Bridge framing the full 75m Celestial Gate, 7-Tier Pagoda & 70m Dragon!
+        const orb = elapsed * 0.10;
+        camPos = [Math.sin(orb) * 16.0, 26.0 + Math.sin(orb * 1.4) * 3.0, -133.0 + Math.cos(orb) * 5.0];
+        const aimX = dragon.pos[0] * 0.35, aimY = 33.0 + (dragon.pos[1] - 36.0) * 0.35, aimZ = -182.0;
+        const dx = aimX - camPos[0], dy = aimY - camPos[1], dz = aimZ - camPos[2];
+        camYaw = Math.atan2(-dx, -dz) + state.lookOffsetYaw;
+        camPitch = Math.max(-0.62, Math.min(0.92, Math.atan2(dy, Math.hypot(dx, dz)) + state.lookOffsetPitch));
+        state.pos = camPos.slice(); state.yaw = camYaw; state.pitch = camPitch; fovy = 58 * Math.PI / 180;
+      } else if (state.mode === "qingqiu") {
+        // Serene unobstructed angle showing Paifang, White Spirit Stag, Cinnabar Maples & full 3/4 Nine-Tailed Spirit Fox!
+        const orb = elapsed * 0.12 + 0.15;
+        camPos = [-82.5 + Math.sin(orb) * 10.0, 13.8 + Math.sin(orb * 1.5) * 1.6, -54.0 + Math.cos(orb) * 8.0];
+        const dx = -94.5 - camPos[0], dy = 10.8 - camPos[1], dz = -79.5 - camPos[2];
+        camYaw = Math.atan2(-dx, -dz) + state.lookOffsetYaw;
+        camPitch = Math.max(-0.62, Math.min(0.92, Math.atan2(dy, Math.hypot(dx, dz)) + state.lookOffsetPitch));
+        state.pos = camPos.slice(); state.yaw = camYaw; state.pitch = camPitch; fovy = 50 * Math.PI / 180;
+      } else if (state.mode === "phoenix") {
+        // Eastern Danshan Sun Spire & Soaring Crimson-Gold Vermilion Phoenixes!
+        const ph = phoenixes[0];
+        const orb = elapsed * 0.11 + 0.2;
+        camPos = [78.0 + Math.sin(orb) * 12.0, 23.0 + Math.sin(orb * 1.4) * 3.0, -70.0 + Math.cos(orb) * 10.0];
+        const dx = (104.0 + ph.pos[0]) * 0.5 - camPos[0], dy = (25.0 + ph.pos[1]) * 0.5 - camPos[1], dz = (-96.0 + ph.pos[2]) * 0.5 - camPos[2];
+        camYaw = Math.atan2(-dx, -dz) + state.lookOffsetYaw;
+        camPitch = Math.max(-0.62, Math.min(0.92, Math.atan2(dy, Math.hypot(dx, dz)) + state.lookOffsetPitch));
+        state.pos = camPos.slice(); state.yaw = camYaw; state.pitch = camPitch; fovy = 52 * Math.PI / 180;
       } else {
         const sm = Math.min(1, dt * 10.0);
         state.yaw += (state.targetYaw - state.yaw) * sm;
         state.pitch += (state.targetPitch - state.pitch) * sm;
         const fwd = [-Math.sin(state.yaw) * Math.cos(state.pitch), Math.sin(state.pitch), -Math.cos(state.yaw) * Math.cos(state.pitch)];
         const right = [Math.cos(state.yaw), 0, -Math.sin(state.yaw)];
-        const acc = 42.0 * dt;
+        const boost = state.keys["shift"] ? 2.4 : 1.0; // Shift = Swift Wind-Glide (御風加速)!
+        const acc = 64.0 * boost * dt;
         if (state.keys["w"] || state.keys["arrowup"])    { state.vel[0] += fwd[0]*acc; state.vel[1] += fwd[1]*acc; state.vel[2] += fwd[2]*acc; }
         if (state.keys["s"] || state.keys["arrowdown"])  { state.vel[0] -= fwd[0]*acc; state.vel[1] -= fwd[1]*acc; state.vel[2] -= fwd[2]*acc; }
         if (state.keys["d"] || state.keys["arrowright"]) { state.vel[0] += right[0]*acc; state.vel[2] += right[2]*acc; }
         if (state.keys["a"] || state.keys["arrowleft"])  { state.vel[0] -= right[0]*acc; state.vel[2] -= right[2]*acc; }
-        if (state.keys[" "] || state.keys["e"])          { state.vel[1] += acc * 0.75; }
-        if (state.keys["shift"] || state.keys["q"])      { state.vel[1] -= acc * 0.75; }
-        const damp = Math.exp(-4.6 * dt);
+        if (state.keys[" "] || state.keys["e"])          { state.vel[1] += acc * 0.72; }
+        if (state.keys["q"] || state.keys["c"])          { state.vel[1] -= acc * 0.72; }
+        const damp = Math.exp(-4.2 * dt);
         for (let i = 0; i < 3; i++) { state.pos[i] += state.vel[i] * dt; state.vel[i] *= damp; }
         clampSafeFPSPos(state.pos);
         const brY = state.entered ? 0 : Math.sin(elapsed * 0.42) * 0.14;
@@ -1623,48 +1510,44 @@ const ShanHaiEngine = (() => {
         fovy = (state.entered ? 50 : 45) * Math.PI / 180;
       }
 
+      // Live Realm Discovery Whisper!
+      if (state.entered && callbacks.onRegion) {
+        const reg = detectRegion(camPos);
+        if (reg.id !== state.lastRegion) {
+          state.lastRegion = reg.id;
+          callbacks.onRegion(reg);
+        }
+      }
+
       const lookDir = [-Math.sin(camYaw) * Math.cos(camPitch), Math.sin(camPitch), -Math.cos(camYaw) * Math.cos(camPitch)];
       const target = [camPos[0] + lookDir[0] * 18, camPos[1] + lookDir[1] * 18, camPos[2] + lookDir[2] * 18];
-      const proj = mat4Perspective(fovy, curW / curH, 0.45, 250.0);
+      const proj = mat4Perspective(fovy, curW / curH, 0.5, 460.0);
       const view = mat4LookAt(camPos, target, [0, 1, 0]);
 
-      // Pass 1: Bake Static Shadow Map
       if (!shadowBaked) {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fboShadow);
-        gl.viewport(0, 0, SHADOW_RES, SHADOW_RES);
-        gl.enable(gl.DEPTH_TEST); gl.depthMask(true); gl.disable(gl.BLEND);
-        gl.clear(gl.DEPTH_BUFFER_BIT);
-        gl.useProgram(progShadow);
-        gl.uniformMatrix4fv(uSh.uLightVP, false, lightVP);
-        gl.uniformMatrix4fv(uSh.uModel, false, identity);
-        gl.uniform1f(uSh.uTime, elapsed);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fboShadow); gl.viewport(0, 0, SHADOW_RES, SHADOW_RES);
+        gl.enable(gl.DEPTH_TEST); gl.depthMask(true); gl.disable(gl.BLEND); gl.clear(gl.DEPTH_BUFFER_BIT);
+        gl.useProgram(progShadow); gl.uniformMatrix4fv(uSh.uLightVP, false, lightVP); gl.uniformMatrix4fv(uSh.uModel, false, identity); gl.uniform1f(uSh.uTime, elapsed);
         gl.bindVertexArray(vaoSolid); gl.drawArrays(gl.TRIANGLES, 0, world.solid.count);
         shadowBaked = true;
       }
 
-      // Pass 2: True Planar Mirror Reflection
       const refEye = [camPos[0], -camPos[1], camPos[2]], refTgt = [target[0], -target[1], target[2]];
       const refView = mat4LookAt(refEye, refTgt, [0, 1, 0]);
       refVPGlobal = mat4Mul(proj, refView);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fboRef);
-      gl.viewport(0, 0, refW, refH);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      drawSceneContent(refView, proj, refEye, kun, boatman, 1.0, true);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fboRef); gl.viewport(0, 0, refW, refH); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      drawSceneContent(refView, proj, refEye, kun1, kun2, dragon, phoenixes, boats, 1.0, true);
 
-      // Pass 3: Full-Res MRT Scene
-      gl.bindFramebuffer(gl.FRAMEBUFFER, fboMain);
-      gl.viewport(0, 0, curW, curH);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fboMain); gl.viewport(0, 0, curW, curH);
       gl.clearBufferfv(gl.COLOR, 0, new Float32Array([0, 0, 0, 0]));
       gl.clearBufferfv(gl.COLOR, 1, new Float32Array([0.5, 0.5, 1.0, 0.0]));
       gl.clearBufferfv(gl.COLOR, 2, new Float32Array([0, 0, 0, 0]));
       gl.clearBufferfi(gl.DEPTH_STENCIL, 0, 1.0, 0);
-      drawSceneContent(view, proj, camPos, kun, boatman, 0.0, false);
+      drawSceneContent(view, proj, camPos, kun1, kun2, dragon, phoenixes, boats, 0.0, false);
 
-      // Pass 4: Volumetric God-Rays & Bloom Blur
       const mainVP = mat4Mul(proj, view);
-      const sunProj = projectPoint(mainVP, camPos[0] + SUN_DIR[0] * 180, camPos[1] + SUN_DIR[1] * 180, camPos[2] + SUN_DIR[2] * 180);
-      const sunDot = Math.max(0, lookDir[0] * SUN_DIR[0] + lookDir[1] * SUN_DIR[1] + lookDir[2] * SUN_DIR[2]);
-      const sunVis = sunProj.inFront ? Math.pow(sunDot, 2.2) : 0.0;
+      const sunProj = projectPoint(mainVP, camPos[0] + SUN_DIR[0] * 260, camPos[1] + SUN_DIR[1] * 260, camPos[2] + SUN_DIR[2] * 260);
+      const sunVis = sunProj.inFront ? Math.pow(Math.max(0, lookDir[0] * SUN_DIR[0] + lookDir[1] * SUN_DIR[1] + lookDir[2] * SUN_DIR[2]), 2.2) : 0.0;
 
       gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.bindVertexArray(vaoEmpty);
       gl.bindFramebuffer(gl.FRAMEBUFFER, fboBloomA); gl.viewport(0, 0, blmW, blmH);
@@ -1683,7 +1566,6 @@ const ShanHaiEngine = (() => {
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texBloomB); gl.uniform1i(uBlr.uTex, 0);
       gl.uniform2f(uBlr.uStep, 0.0, 0.85 / blmH); gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-      // Pass 5: Fine-Art Xuan-Paper Composite & 3D Split Curtain
       gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, curW, curH);
       gl.useProgram(progFinal);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texColor);  gl.uniform1i(uFin.uColorTex, 0);
@@ -1701,7 +1583,7 @@ const ShanHaiEngine = (() => {
 
     return {
       state,
-      enterScroll() { notifyEnter(); state.vel[2] -= 10.5; },
+      enterScroll() { notifyEnter(); state.vel[2] -= 13.5; },
       resetView() {
         state.mode = "free"; state.pos = SPAWN_POS.slice(); state.vel = [0, 0, 0];
         state.yaw = state.targetYaw = SPAWN_YAW; state.pitch = state.targetPitch = SPAWN_PITCH;

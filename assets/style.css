@@ -281,6 +281,31 @@ body.is-entered .enter-stage {
   white-space: nowrap;
 }
 
+/* Poetic Realm Discovery Whisper Banner */
+.region-toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translate(-50%, -8px);
+  z-index: 11;
+  padding: 6px 20px;
+  border-radius: 999px;
+  background: rgba(14, 22, 27, 0.68);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(235, 222, 194, 0.28);
+  color: #f6ecd6;
+  font-size: 13.5px;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.region-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 /* 3D Split Curtain Labels */
 .curtain-handle {
   position: fixed;

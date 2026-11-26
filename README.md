@@ -1,72 +1,71 @@
-# 《山海汴京圖》Shan Hai Bianjing 3D
+# 《山海汴京圖》Shan Hai Bianjing 3D (v4 — 4 Realms × 7 Living Mythic Creatures)
 
-**Looks like a museum Song-Dynasty ink scroll — until you drag the mouse and fly 360° in first person under the Rainbow Bridge beneath a celestial *Shan Hai Jing* Giant Kun.**
+**Looks like a museum Song-Dynasty splash-ink scroll — until you drag the mouse and fly 360° across a 380m × 400m living *Shan Hai Jing* world inhabited by 7 animated mythic creatures.**
 
 > **100% autonomously architected, coded, and visually iterated by Gemini 4 Neon.**
-> Pure native **WebGL2 + GLSL ES 3.00 + Web Audio API** — **zero external dependencies** (no Three.js, no Babylon.js, no textures, no 3D model files).
+> Pure native **WebGL2 + GLSL ES 3.00 + Web Audio API** — **zero external dependencies** (no Three.js, no textures, no 3D model files, no audio files).
 
-### Live Interactive Scroll (v3 Fine-Art Splash-Ink Edition)
+### Live Interactive Scroll (4 Realms · 104,700+ Procedural Triangles)
 - **Enter the Living Painting (`潑彩青綠`)**: https://tbpfs.github.io/shan-hai-scroll-3d/
-- **Split-Curtain 3D X-Ray (`Fine-Art Painting ↔ 65,746-Tri Wireframe`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&curtain=0.5
+- **Split-Curtain 3D X-Ray (`Fine-Art Painting ↔ 104,704-Tri Wireframe`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&curtain=0.5
+- **Mount Buzhou Celestial Gate & 70m Winged Yinglong Dragon (`應龍天門`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=dragon
+- **Mount Buzhou Dragon in Moonlit Gold (`應龍天門・幽冥青燈`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=dragon&style=night
+- **Qingqiu Cinnabar Maple Isles — Nine-Tailed Spirit Foxes & White Spirit Stag (`青丘靈狐`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=qingqiu
+- **Eastern Danshan Sun Spire — Soaring Vermilion Phoenixes (`丹山朱鳳`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=phoenix
+- **Penglai Gorge — Twin Celestial Spirit Kuns (`御鯤蓬萊`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=soar
 - **Ink & Cinnabar Mode (`墨韻丹砂` — Sumi-e × Vermilion)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&style=mono
-- **Moonlit Gold Mode (`幽冥青燈` — Full Moon & Rippling Reflections)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&style=night
-- **First-Person River Cruise (`畫舫穿橋` — glide past the lone boatman under the arch)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=cruise
-- **Cloud-Sea Flight beside the Spirit Kun (`御鯤凌雲`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=soar
 
 ---
 
 ![Song Painting vs 3D Wireframe Split View](docs/screenshots/08_split_curtain_xray.png)
 
-## Visual Showcase (Real WebGL2 Captures)
+## Explore All 4 Realms & 7 Living *Shan Hai Jing* Creatures (Real WebGL2 Captures)
 
-| Opening Song Scroll (`北宋青綠`) | Lantern Night (`上元夜燈`) |
+| Opening Song Scroll (`汴水虹橋・孤舟簑笠`) | Mount Buzhou Gate & 70m Winged Dragon (`不周天門・應龍盤雲`) |
 | :---: | :---: |
-| ![Opening Song Scroll](docs/screenshots/01_opening_scroll.png) | ![Lantern Night Mode](docs/screenshots/07_night_lanterns.png) |
+| ![Opening Scroll](docs/screenshots/01_opening_scroll.png) | ![Dragon Gate](docs/screenshots/10_dragon_buzhou_gate.png) |
 
-| Sumi-e Monochrome (`煙雨焦墨`) | River Cruise under Rainbow Bridge (`畫舫穿橋`) |
+| Moonlit Dragon Gate (`不周天門・幽冥青燈`) | Qingqiu Isles: Nine-Tailed Foxes & Spirit Stag (`青丘丹楓・九尾靈狐`) |
 | :---: | :---: |
-| ![Sumi-e Ink Mode](docs/screenshots/09_sumie_mono.png) | ![River Cruise](docs/screenshots/05_under_bridge_cruise.png) |
+| ![Dragon Night](docs/screenshots/13_dragon_night.png) | ![Qingqiu Fox](docs/screenshots/11_qingqiu_nine_tail_fox.png) |
 
-| Soaring beside the Spirit Kun (`御鯤凌雲`) | 180° Reverse First-Person Vista |
+| Danshan Sun Spire & Vermilion Phoenixes (`丹山朝陽・朱鳳鳴天`) | Penglai Cloud Gorge & Twin Spirit Kuns (`蓬萊雲海・北冥雙鯤`) |
 | :---: | :---: |
-| ![Cloud Kun Soar](docs/screenshots/06_cloud_kun_soar.png) | ![Reverse Vista](docs/screenshots/04_look_back_180.png) |
+| ![Danshan Phoenix](docs/screenshots/12_danshan_phoenix.png) | ![Twin Kun Soar](docs/screenshots/06_cloud_kun_soar.png) |
+
+| Ink & Cinnabar Mode (`墨韻丹砂`) | Moonlit Gold Mode (`幽冥青燈`) |
+| :---: | :---: |
+| ![Sumi-e Mode](docs/screenshots/09_sumie_mono.png) | ![Moonlit Gold](docs/screenshots/07_night_lanterns.png) |
 
 ---
 
-## Fine-Art Rendering Architecture (Hiding WebGL Limits Through Pure Art Direction)
+## The 7 Living Creatures & 4 Mythic Realms
 
-All ~65,700 triangles, splash-ink mineral washes, paper fibers, water reflections, and Guqin acoustics are synthesized in pure JavaScript and GLSL ES 3.00:
+1. **《山海經・應龍》70m Winged Sky-Dragon**: Sinuous 56-ring serpentine body with branching golden antlers, flowing whiskers, golden dorsal crest, and gossamer cloud-wings coiling through the 75m **Mount Buzhou Celestial Stone Arch** above a 7-Tier Imperial Pagoda.
+2. **《山海經・北冥雙鯤》Twin Celestial Kuns**: Mother Kun + companion golden-jade Calf Kun gliding through Penglai Gorge past 6 silk cliff waterfalls and the Cloud Sky-Bridge.
+3. **《山海經・丹山朱鳳》3 Vermilion Phoenixes**: Deep cinnabar-crimson and molten-gold mythic birds trailing 5 billowing 15m silk plumes around the Eastern Sun Spire.
+4. **《山海經・青丘九尾狐》2 Nine-Tailed Spirit Foxes**: Volumetric Xuan-white silk foxes with 9 arched crimson-tipped mist tails swaying beside the Qingqiu Vermilion Paifang archway.
+5. **《山海經・九色靈鹿》2 Golden-Antlered White Spirit Stags**: Serene luminous cliff stags crowned with glowing branching golden antlers.
+6. **《山海經・文鰩錦鯉》28 Leaping Spirit Koi / Flying Fish**: Schools of vermilion-gold fish swimming and leaping arcs right out of the mirror ink sea beside the Lone Boatman and shrines.
+7. **《宋畫・丹頂墨鶴》18 Soaring Ink Cranes & 4 Lantern Boats**: Thermal flocks of cranes, 4 drifting bamboo-hatted Song boats, 12 floating water-lotus lanterns, and 1,650 3D swirling crimson maple petals & spirit sparks.
 
-1. **Zero Muddy Ground Terrain — Mountain-Base Mist Dissolution (`山腳留白・雲斷山腰`)**
-   - Seven receding layers of multi-shouldered karst peaks rise directly out of an infinite mirror ink sea; distant mountain bases dissolve seamlessly into luminous gold-flecked Xuan paper so there are zero "video-game ground seams."
-2. **Domain-Warped Splash-Ink Shading (`張大千潑彩 × 千里江山金碧`)**
-   - Replaces plastic 3D Lambert shading with 2-stage domain-warped watercolor pigment blooms, soft 5-tone ink quantization (`墨分五色`), vertical *Fu-Pi Cun* rock brushwork, and sunlit gold-leaf ridge highlights (`泥金勾勒`).
-3. **True Planar Mirror Water + Lone Boatman Concentric Ink Ripples (`孤舟漣漪`)**
-   - Half-res mirrored camera FBO reflects the moon-arch bridge, cliff pavilion, lantern tassels, crimson maples, and Spirit Kun with expanding concentric ink rings around the lone bamboo-hatted boatman.
-4. **Capillary Xuan-Paper Ink-Bleed UV Warp + Watercolor Wet-Edge Pooling (`水痕邊`)**
-   - Gently displaces screen UV along organic rice-paper fiber gradients before sampling so straight polygon edges tremble like wet ink soaking into handmade paper, paired with natural pigment-pooling rims, 4-sector Kuwahara brushwork, and scattered gold-leaf paper flecks (`灑金宣紙`).
-5. **Volumetric Sun/Moon God-Rays + Separable Bloom + 3D Swirling Crimson Petals (`落紅如雨`)**
-   - 16-step radial crepuscular shafts, soft separable bloom, and 1,150 tumbling 3D maple petals, gold-leaf sparks, and sumi smoke particles.
+---
+
+## Fine-Art Rendering Architecture (Pure WebGL2, 0 External Deps)
+
+- **Mountain-Base Mist Dissolution (`山腳留白・水天一色`)**: Zero muddy 3D dirt slopes; 47 multi-shouldered karst monoliths rise directly out of an infinite mirror ink sea and dissolve softly into gold-flecked Xuan paper.
+- **Domain-Warped Splash-Ink Shading (`張大千潑彩 × 千里江山金碧`)**: Replaces plastic 3D Lambert shading with wet-on-wet mineral turquoise/azurite pigment blooms, 5-tone ink quantization (`墨分五色`), vertical *Fu-Pi Cun* brushwork, and sunlit gold-leaf ridges.
+- **Capillary Xuan-Paper Ink-Bleed + Watercolor Wet-Edge Pooling (`宣紙滲墨・水痕邊`)**: Organic rice-paper fiber UV displacement softens straight polygon edges, paired with natural pigment-pooling rims, 4-sector Kuwahara brushwork, planar mirror water reflections, PCF soft shadows, volumetric god-rays, and separable bloom.
 
 ---
 
 ## Controls
 
-- **Mouse / Touch Drag**: 360° First-Person Free-Look (works in Free Fly, River Cruise, and Cloud Soar!)
-- **Mouse Wheel / `W A S D` / Arrow Keys**: Smooth first-person flight (`Space`/`E` up, `Shift`/`Q` down) with automatic terrain, water & bridge collision safety
+- **Mouse / Touch Drag**: 360° First-Person Free-Look (works in Free Fly and all guided tours!)
+- **`W A S D` / Arrow Keys / Wheel**: Smooth first-person flight (`Shift` = **2.4× Wind-Glide Turbo**, `Space`/`E` up, `Q` down) across the entire 380m × 400m scroll
 - **`X` Key**: Toggle 50% Song Painting ↔ 3D Wireframe split curtain
-- **`1` / `2` / `3` Keys**: Switch between Song Jade (`北宋青綠`), Sumi-e Ink (`煙雨焦墨`), and Lantern Night (`上元夜燈`)
-- **`R` Key**: Reset first-person viewpoint
-
----
-
-## Local Run & Verification
-
-```bash
-python -m http.server 8080
-# Open http://localhost:8080/
-python tests/verify_scroll.py
-```
+- **`1` / `2` / `3` Keys**: Switch between `潑彩青綠`, `墨韻丹砂`, and `幽冥青燈`
+- **`R` Key**: Reset to opening scroll viewpoint
 
 ---
 

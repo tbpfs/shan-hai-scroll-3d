@@ -32,7 +32,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20261126-v3">
+<link rel="stylesheet" href="assets/style.css?v=20261126-v4">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -94,8 +94,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- 開場「踏入畫卷」浮動印鈕 -->
 <div class="enter-stage">
   <button type="button" class="enter-btn" id="btnEnter" data-zh="踏入畫卷" data-en="ENTER THE 3D SCROLL">踏入畫卷</button>
-  <span class="enter-hint" data-zh="第一人稱自由漫遊 · 拖曳 360° 環顧 · 滾輪 / WASD 穿越虹橋與雲海" data-en="First-person 3D ink world · Drag to look 360° · Scroll or WASD to fly under the bridge">第一人稱自由漫遊 · 拖曳 360° 環顧 · 滾輪 / WASD 穿越虹橋與雲海</span>
+  <span class="enter-hint" data-zh="千里山海四境 · 拖曳 360° 環顧 · WASD 飛行（Shift 御風加速）探索七大山海靈獸" data-en="4 Mythic Realms · Drag to look 360° · WASD to fly (Shift boost) &amp; discover 7 Shan Hai Jing creatures">千里山海四境 · 拖曳 360° 環顧 · WASD 飛行（Shift 御風加速）探索七大山海靈獸</span>
 </div>
+
+<!-- 飛入新境時如煙浮現的境名題字 -->
+<div class="region-toast" id="regionToast" aria-live="polite"></div>
 
 <!-- 3D 幕簾對照浮標 -->
 <div class="curtain-handle" id="curtainHandle" aria-hidden="true">
@@ -105,10 +108,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <!-- 底部極簡墨玉控制列（入畫後浮現） -->
 <div class="dock" role="toolbar" aria-label="視角與水墨控制列">
-  <div class="dock-group" role="group" aria-label="第一人稱視角">
-    <button type="button" class="dock-btn active" data-mode="free" data-zh="自由漫遊 (WASD)" data-en="Free Fly (FPS)">自由漫遊 (WASD)</button>
-    <button type="button" class="dock-btn" data-mode="cruise" data-zh="畫舫穿橋" data-en="River Cruise">畫舫穿橋</button>
-    <button type="button" class="dock-btn" data-mode="soar" data-zh="御鯤凌雲" data-en="Cloud Soar">御鯤凌雲</button>
+  <div class="dock-group" role="group" aria-label="山海四境導覽">
+    <button type="button" class="dock-btn active" data-mode="free" data-zh="自由漫遊" data-en="Free Fly">自由漫遊</button>
+    <button type="button" class="dock-btn" data-mode="cruise" data-zh="畫舫穿橋" data-en="Bridge">畫舫穿橋</button>
+    <button type="button" class="dock-btn" data-mode="soar" data-zh="御鯤蓬萊" data-en="Twin Kun">御鯤蓬萊</button>
+    <button type="button" class="dock-btn" data-mode="dragon" data-zh="應龍天門" data-en="Dragon Gate">應龍天門</button>
+    <button type="button" class="dock-btn" data-mode="qingqiu" data-zh="青丘靈狐" data-en="Nine-Tail Fox">青丘靈狐</button>
+    <button type="button" class="dock-btn" data-mode="phoenix" data-zh="丹山朱鳳" data-en="Phoenix">丹山朱鳳</button>
     <button type="button" class="dock-btn subtle" id="btnReset" title="Reset View (R)" data-zh="復位" data-en="Reset">復位</button>
   </div>
   <span class="dock-sep" aria-hidden="true"></span>
@@ -133,9 +139,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   </div>
 </noscript>
 
-<script src="assets/geometry.js?v=20261126-v3"></script>
-<script src="assets/audio.js?v=20261126-v3"></script>
-<script src="assets/engine.js?v=20261126-v3"></script>
+<script src="assets/geometry.js?v=20261126-v4"></script>
+<script src="assets/audio.js?v=20261126-v4"></script>
+<script src="assets/engine.js?v=20261126-v4"></script>
 <script>
 (() => {
   "use strict";
@@ -148,6 +154,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   const btnLang = document.getElementById("btnLang");
   const btnEnter = document.getElementById("btnEnter");
   const btnReset = document.getElementById("btnReset");
+  const regionToast = document.getElementById("regionToast");
+  let toastTimer = null;
+
+  function showRegion(reg) {
+    regionToast.textContent = lang === "en" ? reg.en : reg.zh;
+    regionToast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => regionToast.classList.remove("show"), 3200);
+  }
 
   let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "zh";
   let audioOn = false;
@@ -191,6 +206,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   const engine = ShanHaiEngine.create(canvas, {
     onEnter: markEntered,
     onModeChange: syncModeButtons,
+    onRegion: showRegion,
     onStats: ({ fps, tris }) => {
       const fpsPart = fps >= 15 ? ` · ${fps} FPS` : "";
       statsEl.textContent = `${tris.toLocaleString()} TRIS${fpsPart}`;

@@ -2,6 +2,7 @@
 """Automated verification suite for Shan Hai Bianjing 3D (山海汴京圖)."""
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -30,6 +31,30 @@ def main() -> int:
     assert "ai-purplemaple.com" in idx, "Missing Purple Maple linkback"
     assert "og-cover.png" in idx, "Missing PNG og-cover"
     assert (ROOT / "assets" / "og-cover.png").is_file(), "og-cover.png not generated"
+
+    # Verify Bidirectional YouTube VideoObject JSON-LD + Key Moments Clips + Lazy Embed
+    m_ld = re.search(r'<script type="application/ld\+json">\s*(\{.*?\})\s*</script>', idx, re.S)
+    assert m_ld, "Missing JSON-LD block in index.html"
+    ld = json.loads(m_ld.group(1))
+    graph = ld.get("@graph") or []
+    by_type = {node.get("@type"): node for node in graph}
+    assert "SoftwareSourceCode" in by_type, "Missing SoftwareSourceCode node in @graph"
+    assert "VideoObject" in by_type, "Missing VideoObject node in @graph"
+    vo = by_type["VideoObject"]
+    assert vo["contentUrl"] == "https://www.youtube.com/watch?v=7JJhwuBtrCM"
+    assert vo["embedUrl"] == "https://www.youtube.com/embed/7JJhwuBtrCM"
+    assert vo["duration"] == "PT3M30S"
+    assert vo["author"]["@id"] == "https://ai-purplemaple.com/#creator"
+    clips = vo.get("hasPart") or []
+    assert len(clips) == 12, f"Expected 12 Key Moments clips, got {len(clips)}"
+    prev_end = -1
+    for c in clips:
+        assert c["@type"] == "Clip"
+        assert c["startOffset"] < c["endOffset"], f"Invalid Clip offset: {c}"
+        assert c["startOffset"] >= prev_end, f"Non-monotonic Clip offset: {c}"
+        prev_end = c["endOffset"]
+    assert 'src="https://www.youtube.com/embed/7JJhwuBtrCM"' in idx, "Missing lazy YouTube embed iframe"
+    print(f"[PASS] VideoObject JSON-LD + {len(clips)} Key Moments Clips + lazy embed OK")
 
     for p in ROOT.rglob("*"):
         if p.is_dir() or p.suffix.lower() in {".png", ".jpg", ".webp"} or ".git" in p.parts:

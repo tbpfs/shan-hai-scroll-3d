@@ -791,6 +791,82 @@ body.is-entered .dock {
   #curtainSlider { width: 64px; }
 }
 
+/* Video Devlog Modal (Zero-LCP-Cost Native Dialog matching Ink-Jade Scroll Aesthetic) */
+.link-video {
+  border-color: rgba(235, 196, 114, 0.52);
+  color: #f7deb0;
+}
+.video-modal {
+  margin: auto;
+  width: min(92vw, 860px);
+  padding: 0;
+  border: 1.5px solid rgba(235, 222, 194, 0.36);
+  border-radius: 16px;
+  background: rgba(12, 20, 25, 0.96);
+  color: #f6ecd6;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.72);
+  overflow: hidden;
+}
+.video-modal::backdrop {
+  background: rgba(6, 11, 14, 0.76);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.video-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(235, 222, 194, 0.18);
+}
+.video-modal-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #f6e7c6;
+}
+.video-modal-close {
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(235, 222, 194, 0.28);
+  background: rgba(243, 234, 212, 0.08);
+  color: #f6ecd6;
+  font-size: 14px;
+  cursor: pointer;
+}
+.video-modal-close:hover {
+  background: rgba(185, 50, 38, 0.75);
+  border-color: rgba(250, 226, 178, 0.55);
+}
+.video-frame-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #060a0d;
+}
+.video-frame-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.video-modal-foot {
+  padding: 10px 16px;
+  text-align: right;
+  border-top: 1px solid rgba(235, 222, 194, 0.14);
+}
+.video-ext-link {
+  color: #e6c47a;
+  font-size: 12.5px;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+.video-ext-link:hover { text-decoration: underline; }
+
 /* Accessibility: Respect Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   .scroll-mount,

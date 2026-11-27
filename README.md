@@ -6,6 +6,7 @@
 > Pure native **WebGL2 + GLSL ES 3.00 + Web Audio API** — **zero external dependencies** (no Three.js, no textures, no 3D model files, no audio files).
 
 ### Live Interactive Scroll (4 Realms · 104,700+ Procedural Triangles)
+- **Watch the 5-Round Making-Of Video (YouTube 16:9 Devlog)**: https://www.youtube.com/watch?v=7JJhwuBtrCM
 - **Enter the Living Painting (`潑彩青綠`)**: https://tbpfs.github.io/shan-hai-scroll-3d/
 - **Split-Curtain 3D X-Ray (`Fine-Art Painting ↔ 104,704-Tri Wireframe`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&curtain=0.5
 - **Mount Buzhou Celestial Gate & 70m Winged Yinglong Dragon (`應龍天門`)**: https://tbpfs.github.io/shan-hai-scroll-3d/?enter=1&mode=dragon

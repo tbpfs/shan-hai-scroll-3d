@@ -29,14 +29,29 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="twitter:title" content="Shan Hai Bianjing 3D v4 — 4 Mythic Ink Realms & 7 Living Beasts in Pure WebGL2">
 <meta name="twitter:description" content="First-person 380m×400m 3D Song-dynasty splash-ink world built in pure zero-dependency WebGL2 by Gemini 4 Neon: Winged Yinglong Dragon, Twin Kuns, Nine-Tailed Foxes, Phoenixes & live 3D X-Ray curtain.">
 <meta name="twitter:image" content="https://tbpfs.github.io/shan-hai-scroll-3d/assets/og-cover.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23162228'/%3E%3Crect x='8' y='8' width='48' height='48' rx='6' fill='none' stroke='%23b93226' stroke-width='3'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='30' font-family='serif' font-weight='bold' fill='%23f3ead4'%3E%E5%B1%B1%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=20261127-v4-video">
+<link rel="stylesheet" href="assets/style.css?v=20261128-r1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://tbpfs.github.io/shan-hai-scroll-3d/#webpage",
+      "url": "https://tbpfs.github.io/shan-hai-scroll-3d/",
+      "name": "山海汴京圖｜清明上河圖 × 山海經 3D 即時水墨世界 (WebGL2)",
+      "inLanguage": ["zh-Hant", "en"],
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": ["h1", ".aeo-capsule"]
+      },
+      "mainEntity": {
+        "@id": "https://tbpfs.github.io/shan-hai-scroll-3d/#software"
+      }
+    },
     {
       "@type": "SoftwareSourceCode",
       "@id": "https://tbpfs.github.io/shan-hai-scroll-3d/#software",
@@ -174,6 +189,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
 </head>
 <body>
+<a class="skip-link" href="#main-content" data-zh="跳至畫卷說明" data-en="Skip to Scroll Guide">跳至畫卷說明</a>
 <canvas id="glCanvas" aria-label="山海汴京圖 3D 即時水墨世界畫布"></canvas>
 
 <!-- 細緻宋絹裝裱內框 -->
@@ -206,10 +222,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </div>
 
 <!-- 右上古典豎排題跋與朱砂閒章（入畫後如煙淡出） -->
-<aside class="colophon" aria-hidden="true">
+<aside class="colophon">
   <h1 class="colophon-title">山海汴京圖</h1>
   <p class="colophon-sub">清明虹橋・千里青綠・山海七靈</p>
-  <div class="seals">
+  <div class="seals" aria-hidden="true">
     <span class="seal-stamp solid">紫楓<br>監製</span>
     <span class="seal-stamp">霓虹<br>入畫</span>
   </div>
@@ -283,6 +299,31 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <a class="video-ext-link" href="https://www.youtube.com/watch?v=7JJhwuBtrCM" target="_blank" rel="noopener" data-zh="前往 YouTube 觀看完整章節與留言點菜 ↗" data-en="Watch full chapters on YouTube ↗">前往 YouTube 觀看完整章節與留言點菜 ↗</a>
   </div>
 </dialog>
+
+<!-- 畫卷卷軸考據與無障礙語意主體（零干擾畫布，展開可讀完整四境七靈規格與開源授權） -->
+<main id="main-content" class="scroll-archive">
+  <details class="scroll-dossier">
+    <summary class="scroll-dossier-summary" data-zh="畫卷考據與引擎規格" data-en="Scroll Specs &amp; About">畫卷考據與引擎規格</summary>
+    <div class="scroll-dossier-body">
+      <p class="aeo-capsule">《山海汴京圖 (Shan Hai Bianjing 3D)》是一座零外部依賴、不載入任何貼圖檔的純 WebGL2 五段式即時 3D 水墨開放世界，由紫楓監製並交由 Gemini 4 Neon 歷經五輪迭代全自動編寫完成。全圖橫跨 380m×400m 四大仙境，即時運算 104,704 個程序化三角形，結合張大千潑彩青綠、宋元宣紙毛細滲墨、即時平面水面倒影、PCF 軟陰影與可拉動對照的 3D 拓撲線框幕簾。</p>
+      <h2>四大神話境域與七大山海靈獸</h2>
+      <ul>
+        <li><strong>汴水虹橋與宋代街市</strong>：復刻《清明上河圖》飛虹木拱橋、漕運畫舫、茶肆垂柳與兩岸水榭倒影，支援第一人稱穿橋漫遊。</li>
+        <li><strong>蓬萊雲海與北冥雙鯤</strong>：巨型雙鯤於青綠雲海間同步盤旋躍水，呈現《逍遙遊》與《山海經》海境氣象。</li>
+        <li><strong>不周天門與七十米應龍</strong>：翼展綿延的應龍環繞不周山天門，搭配隱藏「幽冥青燈」月夜光影模式展現鎏金鱗光。</li>
+        <li><strong>青丘靈狐與丹山朱鳳</strong>：九尾靈狐丹鳳金眸凝視來者，與丹山朱鳳呼應「潑彩青綠」「墨韻丹砂」「幽冥青燈」三種即時水墨後製濾鏡。</li>
+      </ul>
+      <h2>零依賴 WebGL2 五段式渲染管線與操作快捷鍵</h2>
+      <p>所有地形高度場、宋式斗拱、雙鯤骨骼動畫、九尾擺動與古琴五聲音階 Web Audio 合成均由純原生 JavaScript 與 GLSL 撰寫，無需 Three.js 或任何外部 CDN 資產。電腦版可拖曳 360° 環顧、以 WASD 飛行（按住 Shift 加速），並透過 <code>X</code> 鍵拉開 50% 3D 線框透視幕簾、<code>1/2/3</code> 切換三種水墨意境、<code>H</code> 藏鏡截圖、<code>R</code> 復位視角；手機與平板支援單指環顧與雙指開合飛行。</p>
+      <footer class="scroll-dossier-footer">
+        <span>MIT Open Source · Built by <a href="https://ai-purplemaple.com/" target="_blank" rel="noopener">紫楓 Purple Maple</a></span>
+        <a href="https://github.com/tbpfs/shan-hai-scroll-3d" target="_blank" rel="noopener">GitHub 原始碼</a>
+        <a href="https://www.youtube.com/watch?v=7JJhwuBtrCM" target="_blank" rel="noopener">5 輪開發實錄影片</a>
+        <a href="https://ai-purplemaple.com/learn/" target="_blank" rel="noopener">紫楓出版社</a>
+      </footer>
+    </div>
+  </details>
+</main>
 
 <noscript>
   <div class="noscript-fallback">
